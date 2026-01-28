@@ -1,0 +1,63 @@
+.BG
+{
+    background: #76b852;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+.mainBox{
+    background: white;
+    width: 360px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    box-shadow: 0 0 25px -10px black;
+    padding-top: 20px;
+    padding-bottom: 40px;
+}
+
+.formBox
+{
+    width: 85%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.inputBox{
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.inputBoxWrite
+{
+    padding: 15px;
+    width: 100%;
+    border-style: solid;
+    border-radius: 10px;
+    background: #eeeeee;
+    border-color: #eeeeee;
+    font-size: 14px;
+    border-width: 2px;
+    outline: none;
+
+}
+.buttonLogin
+{
+    width: 85%;
+    padding: 15px;
+    background: #43a047;
+    border-radius: 10px;
+    border-color: #43a047;
+    color: white;
+    border-style: solid;
+    font-size: 20px;
+}
+.errorMsg{
+    text-align: left;
+}

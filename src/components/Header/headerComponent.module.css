@@ -1,0 +1,48 @@
+.headerBox
+{
+    background: #76b852;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+
+}
+
+.figureBox
+{
+
+}
+
+.nameDisplayHeader
+{
+    font-size: 1.5em;
+}
+
+.navMenuBox
+{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    color: white;
+    height: 0;
+}
+
+.adminBtn, .logOutBtn
+{
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    border-radius: 5px;
+    background: #43a047;
+    border-style: solid;
+    border-color: #43a047;
+
+}
+
+.adminIcon, .logOutIcon
+{
+
+    width: 1.875rem;
+
+}

@@ -1,0 +1,24 @@
+const baseURL = 'http://127.0.0.1:8000/'
+
+const urls = {
+    orders: {
+        getOrders: (filterLink: string): string => `/orders${filterLink}`,
+        getGroups: (): string => `/orders/view_groups`
+    },
+    users:{
+        getManagers: (filterLink: string): string => `/users/view_managerList${filterLink}`,
+        getManagerName: (): string => `/users/checkUser`,
+        SetPassword: (token: string) => `/users/set_password/${token}`,
+        BanManager: (id: number) => `users/block_manager/${id}`,
+        unbanManager: (id: number) => `users/unblock_manager/${id}`,
+        activateManager: (id: number) => `users/activate_manager/${id}`,
+    },
+    auth:{
+        getAuth: (): string => `/auth/login`
+    }
+}
+
+export {
+    baseURL,
+    urls
+}
