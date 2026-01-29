@@ -9,9 +9,23 @@
 
 }
 
-.statsHeader{
-    font-size: 20px;
+.infoBox{
+    width: 20%;
 }
+
+.statsHeader{
+    display: flex;
+    flex-direction: column;
+}
+
+.statsHeaderBox{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    height: 5vh;
+}
+
 .createBox{
     width: 80%;
     display: flex;
@@ -24,7 +38,7 @@
     width: 80%;
     padding: 25px;
     display: flex;
-    gap: 30px;
+    gap: 5px;
     text-align: left;
     border-radius: 10px;
     border-width: 2px;
@@ -50,7 +64,20 @@ button{
     gap: 10px;
 }
 
-.totalBox{}
+.totalBox{
+    width: 15%;
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    align-items: flex-start;
+}
+.statsTotalBox{
+    display: flex;
+    justify-content: space-evenly;
+    gap: 30px;
+    font-size: 20px;
+    height: 10vh;
+}
 
 .mainButtonBox{
     display: flex;

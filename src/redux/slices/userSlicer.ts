@@ -63,6 +63,18 @@ const setPassword = createAsyncThunk(
     }
 )
 
+const createManager = createAsyncThunk(
+    'userSlice/createManager',
+    async ({email,name,surname}: {email: string, name: string, surname: string}, thunkAPI)=> {
+        try {
+            const response = await usersService.createManager(email,name,surname)
+            return thunkAPI.fulfillWithValue(response.data)
+        }catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response?.data?.detail || "Failed to create manager");
+        }
+    }
+)
+
 const banManager = createAsyncThunk(
     'userSlice/banManager',
     async (id: number, thunkAPI) => {
@@ -125,6 +137,12 @@ const userSlice = createSlice({
             .addCase(setPassword.fulfilled, (state) => {
                 state.loading = false
             })
+            .addCase(createManager.rejected, (state) => {
+                state.loading = false
+            })
+            .addCase(createManager.fulfilled, (state) => {
+                state.loading = false
+            })
             .addCase(setPassword.rejected, (state) => {
                 state.loading = false
             })
@@ -148,7 +166,7 @@ const userSlice = createSlice({
             .addCase(activateManager.rejected, (state) => {
                 state.loading = false
             })
-            .addMatcher(isFulfilled(getManagers, getManagerName, setPassword, unbanManager, banManager, activateManager), (state) => {
+            .addMatcher(isFulfilled(getManagers, getManagerName, setPassword, unbanManager, banManager, activateManager, createManager), (state) => {
                 state.loading = true
             })
 })
@@ -162,7 +180,8 @@ const userActions = {
     setPassword,
     banManager,
     unbanManager,
-    activateManager
+    activateManager,
+    createManager
 }
 
 export {

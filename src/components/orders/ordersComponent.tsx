@@ -1,8 +1,12 @@
-import React, {ChangeEvent, useEffect} from 'react';
+import React, {ChangeEvent, FormEvent, useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from "../../redux/store/store";
 import {useSearchParams} from "react-router-dom";
 import {orderActions} from "../../redux/slices/orderSlicer";
 import css from "./ordersComponent.module.css"
+import {userActions} from "../../redux/slices/userSlicer";
+import resetIcon from "../../assets/reset.51c9a5b2e5527c0bfbcaf74793deb908.svg"
+import fileIcon from "../../assets/xls.476bc5b02e8b94a61782636d19526309.svg"
+
 
 const OrdersComponent = () => {
 
@@ -12,6 +16,9 @@ const OrdersComponent = () => {
     const {orders} = useAppSelector((state) => state.order)
     const loading = useAppSelector((state) => state.order.loading)
     const {groups} = useAppSelector((state) => state.order)
+    const {user} = useAppSelector((state) => state.user)
+
+    const [expandedId, setExpandedId] = useState<number | null>(null);
 
     const dispatch = useAppDispatch()
 
@@ -22,11 +29,10 @@ const OrdersComponent = () => {
     useEffect(() => {
 
         dispatch(orderActions.getOrders(filterString))
+        dispatch(userActions.getManagerName())
         dispatch(orderActions.getGroups())
 
     }, [dispatch, query, filterString]);
-
-    console.log(groups)
 
     const HandleOrderQuery = (key: string) => {
 
@@ -78,6 +84,65 @@ const OrdersComponent = () => {
 
 
     }
+
+    const handleCheckQuery = (e: ChangeEvent<HTMLInputElement>) => {
+
+
+        const checked = e.target.checked
+
+        const qsName = e.target.name
+
+        const name = String(user?.name)
+
+        const params = new URLSearchParams(searchParams);
+
+        if(checked){
+
+            if (!params.has('page')) params.set('page', '1');
+
+            params.set(qsName, name)
+
+            setSearchParams(params);
+        }
+        else if(!checked){
+            params.delete(qsName)
+
+            setSearchParams(params);
+        }
+
+
+    }
+
+    const handleQueryReset = (e: FormEvent<HTMLButtonElement>) => {
+
+        e.preventDefault()
+
+        let resetParams = ''
+
+        setSearchParams(resetParams)
+
+        let newParams = '?page=1&order=-id'
+
+        setSearchParams(newParams)
+
+        window.location.reload()
+
+
+
+    }
+
+    const handleDownload = async () => {
+
+        await dispatch(orderActions.getExcel())
+    }
+
+    const displayValue = (value?: string | number | null) => {
+        if (value === null || value === undefined) return 'null';
+        if (typeof value === 'string' && value.trim() === '') return 'null';
+        return value;
+    };
+
+
 
     return (
         <div>
@@ -197,19 +262,19 @@ const OrdersComponent = () => {
 
                     </section>
 
-                    <label>
-                        My<input name={"manager"} onChange={handleChangeQuery} className={css.check} type={'checkbox'}/>
+                    <label className={css.checkBox}>
+                        <input className={css.checkInputBox} name={"manager"} onChange={handleCheckQuery} type={'checkbox'}/>My
                     </label>
 
-                    <label>
-                        <button>Refresh</button>
+                    <label className={css.resetBox}>
+                        <button className={css.buttonsFilter} onClick={handleQueryReset}><img className={css.resetIconBtn} src={resetIcon} alt={''} /></button>
                     </label>
                 </form>
 
 
                 <section>
                     <label>
-                        <button>Excl</button>
+                        <button className={css.buttonsFilter} onClick={handleDownload}><img className={css.fileIconBtn} src={fileIcon} alt={''}/></button>
                     </label>
                 </section>
 
@@ -219,9 +284,9 @@ const OrdersComponent = () => {
 
                 {!loading && <h1>Loading...</h1>}
 
-                {loading && <table>
+                {loading && <table className="orders-table">
                     <thead>
-                        <tr>
+                        <tr className="bg-green-500 text-white">
                             <th onClick={() => HandleOrderQuery('id')}>id</th>
                             <th onClick={() => HandleOrderQuery('name')}>name</th>
                             <th onClick={() => HandleOrderQuery('surname')}>surname</th>
@@ -239,27 +304,60 @@ const OrdersComponent = () => {
                             <th onClick={() => HandleOrderQuery('manager')}>manager</th>
                         </tr>
                     </thead>
-                    <tbody>
-                    {orders.map((order) => <tr key={order.id} onClick={() => console.log(order.id)}>
-                        <td>{order.id ?? "null"}</td>
-                        <td>{order.name.toString()}</td>
-                        <td>{order.surname ?? "null"}</td>
-                        <td>{order.email ?? "null"}</td>
-                        <td>{order.phone ?? "null"}</td>
-                        <td>{order.age ?? "null"}</td>
-                        <td>{order.course ?? "null"}</td>
-                        <td>{order.course_format ?? "null"}</td>
-                        <td>{order.course_type ?? "null"}</td>
-                        <td>{order.status ?? "null"}</td>
-                        <td>{order.sum ?? "null"}</td>
-                        <td>{order.alreadyPaid ?? "null"}</td>
-                        <td>{order.group ?? "null"}</td>
-                        <td>{order.created_date ?? "null"}</td>
-                        <td>{order.manager ?? "null"}</td>
-                    </tr>)}
-                    </tbody>
-                </table>}
 
+                    {orders.map((order, index) => <tbody key={order.id}>
+                    <tr style={{
+                        backgroundColor: index % 2 === 0 ? "white" : "lightgrey",
+                    }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#76b852")}
+                        onMouseLeave={(e) =>
+                            (e.currentTarget.style.backgroundColor =
+                                index % 2 === 0 ? "white" : "lightgrey")}
+                        onClick={() => setExpandedId(expandedId === order.id ? null : order.id)}>
+                        <td>{displayValue(order.id)}</td>
+                        <td>{displayValue(order.name)}</td>
+                        <td>{displayValue(order.surname)}</td>
+                        <td>{displayValue(order.email)}</td>
+                        <td>{displayValue(order.phone)}</td>
+                        <td>{displayValue(order.age)}</td>
+                        <td>{displayValue(order.course)}</td>
+                        <td>{displayValue(order.course_format)}</td>
+                        <td>{displayValue(order.course_type)}</td>
+                        <td>{displayValue(order.status)}</td>
+                        <td>{displayValue(order.sum)}</td>
+                        <td>{displayValue(order.alreadyPaid)}</td>
+                        <td>{displayValue(order.group)}</td>
+                        <td>{displayValue(order.created_date)}</td>
+                        <td>{displayValue(order.manager)}</td>
+                    </tr>
+                    {expandedId === order.id && (<tr key={order.id}>
+                        <td colSpan={15} className={css.openWindowBox}
+                            style={{backgroundColor: index % 2 === 0 ? "white" : "lightgrey",}}
+                        >
+                            <div className={css.windowBox}>
+                                <div className={css.messageBox}>
+                                    UTM: {displayValue(order.utm)}<br/>
+                                    msg: {displayValue(order.msg)}
+                                </div>
+                                <div>
+                                    <div>
+
+                                    </div>
+                                    <div>
+                                        <input type={"text"} placeholder={"Comment"}/>
+                                        <button>SUBMIT</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button>EDIT</button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    )}</tbody>
+                    )}
+
+                </table>}
             </main>
         </div>
     );

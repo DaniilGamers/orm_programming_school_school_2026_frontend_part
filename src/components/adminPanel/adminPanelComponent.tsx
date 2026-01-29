@@ -3,15 +3,21 @@ import {useAppDispatch, useAppSelector} from "../../redux/store/store";
 import {useSearchParams} from "react-router-dom";
 import {userActions} from "../../redux/slices/userSlicer";
 import css from "./adminPanel.module.css"
+import {useCreateMenu} from "../../redux/context/CreateMenuContext";
+import {orderActions} from "../../redux/slices/orderSlicer";
 
 const AdminPanelComponent = () => {
 
     const dispatch = useAppDispatch()
 
-    const loading = useAppSelector((state) => state.order.loading)
+    // loading = useAppSelector((state) => state.order.loading)
+
+    const { openMenu } = useCreateMenu()
 
     const {users} = useAppSelector((state) => state.user)
     const {user} = useAppSelector((state) => state.user)
+
+    //const {orders} = useAppSelector((state) => state.order)
 
     const [link, setLink] = useState<Record<number, string>>({})
 
@@ -22,7 +28,8 @@ const AdminPanelComponent = () => {
     const filterString = '?' + query.toString();
 
     useEffect(() => {
-        dispatch(userActions.getManagers(filterString))
+        dispatch(userActions.getManagers(''))
+        dispatch(orderActions.getOrders(''))
     }, [dispatch,filterString]);
 
     const ban = async (id: number) =>  {
@@ -99,20 +106,30 @@ const AdminPanelComponent = () => {
             <main className={css.mainBox}>
 
                 <div className={css.statsHeader}>
-                    <p>Orders statistic</p>
+                    <div className={css.statsHeaderBox}><p>Orders statistic</p></div>
+                    <div className={css.statsTotalBox}>
+                        <p>total:</p>
+                        <p>In work:</p>
+                        <p>null:</p>
+                        <p>Agree:</p>
+                        <p>Disagree:</p>
+                        <p>Dubbing:</p>
+                        <p>New:</p>
+                    </div>
+
                 </div>
 
                 <div className={css.createBox}>
 
-                    <button>CREATE</button>
+                    <button onClick={() => openMenu('manager')}>CREATE</button>
 
                 </div>
 
                 {user && user.is_superuser && users.map((user) =>
 
                     <section className={css.managerListBox}
-                             key={user.id}>id: {user.id}<br/>email: {user.email}<br/>name: {user.name}<br/>surname: {user.surname}<br/>is_active: {String(user.is_active)}<br/>last_login: {String(user.last_login_display)}
-                        <div><p>Total</p></div>
+                             key={user.id}><div className={css.infoBox}>id: {user.id}<br/>email: {user.email}<br/>name: {user.name}<br/>surname: {user.surname}<br/>is_active: {String(user.is_active)}<br/>last_login: {String(user.last_login_display)}</div>
+                        <div className={css.totalBox}><span>Total:</span></div>
                         <div className={css.menuBox}>
                             <div className={css.mainButtonBox}>
                                 <button

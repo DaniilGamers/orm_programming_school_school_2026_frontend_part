@@ -51,6 +51,35 @@ const getGroups = createAsyncThunk(
     }
 )
 
+const getExcel = createAsyncThunk(
+    "orderSlice/getExcel",
+    async (_, thunkAPI) => {
+        try {
+            const response = await ordersService.getExcel();
+
+
+            const url = window.URL.createObjectURL(response.data);
+            const a = document.createElement("a");
+
+            const today = new Date();
+            const day = String(today.getDate()).padStart(2, "0");
+            const month = String(today.getMonth() + 1).padStart(2, "0");
+            const year = today.getFullYear();
+
+            a.href = url;
+            a.download = `${month}.${day}.${year}.xls`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+
+            return true;
+        } catch (e) {
+            return thunkAPI.rejectWithValue("Something went wrong...");
+        }
+    }
+);
+
 const orderSlice = createSlice({
     name: 'orderSlice',
     initialState: orderInitState,
@@ -73,7 +102,13 @@ const orderSlice = createSlice({
             .addCase(getGroups.rejected, (state) => {
                 state.loading = false
             })
-            .addMatcher(isFulfilled(getOrders, getGroups), (state) => {
+            .addCase(getExcel.fulfilled, (state, action) => {
+                state.loading = false;
+            })
+            .addCase(getExcel.rejected, (state) => {
+                state.loading = false
+            })
+            .addMatcher(isFulfilled(getOrders, getGroups, getExcel), (state) => {
                 state.loading = true;
             })
 })
@@ -82,7 +117,8 @@ const {reducer: orderReducer, actions} = orderSlice;
 const orderActions = {
     ...actions,
     getOrders,
-    getGroups
+    getGroups,
+    getExcel
 }
 
 export {

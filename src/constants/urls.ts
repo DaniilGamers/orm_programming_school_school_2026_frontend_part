@@ -3,7 +3,8 @@ const baseURL = 'http://127.0.0.1:8000/'
 const urls = {
     orders: {
         getOrders: (filterLink: string): string => `/orders${filterLink}`,
-        getGroups: (): string => `/orders/view_groups`
+        getGroups: (): string => `/orders/view_groups`,
+        getExcel:(): string => `/orders/export`
     },
     users:{
         getManagers: (filterLink: string): string => `/users/view_managerList${filterLink}`,
@@ -12,6 +13,7 @@ const urls = {
         BanManager: (id: number) => `users/block_manager/${id}`,
         unbanManager: (id: number) => `users/unblock_manager/${id}`,
         activateManager: (id: number) => `users/activate_manager/${id}`,
+        createManager: () => `users/create_manager`,
     },
     auth:{
         getAuth: (): string => `/auth/login`

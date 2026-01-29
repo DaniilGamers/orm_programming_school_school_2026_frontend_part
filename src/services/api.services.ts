@@ -21,7 +21,8 @@ axiosInstance.interceptors.request.use(request => {
 
 const ordersService = {
     getOrders:(filterLink: string):IRes<OrdersPageModel<OrdersModel>> => axiosInstance.get(urls.orders.getOrders(filterLink)),
-    getGroups:():IRes<GroupsPageModel<GroupsModel>> => axiosInstance.get(urls.orders.getGroups())
+    getGroups:():IRes<GroupsPageModel<GroupsModel>> => axiosInstance.get(urls.orders.getGroups()),
+    getExcel:() => axiosInstance.get(urls.orders.getExcel(), {  responseType: "blob", withCredentials: true })
 }
 
 const usersService = {
@@ -31,10 +32,11 @@ const usersService = {
     banManager:(id: number) => axiosInstance.patch(urls.users.BanManager(id)),
     unbanManager:(id: number) => axiosInstance.patch(urls.users.unbanManager(id)),
     activateManager:(id: number):IRes<ActivateModel> => axiosInstance.post(urls.users.activateManager(id)),
+    createManager:(email: string, name: string, surname: string) => axiosInstance.post(urls.users.createManager(), {email,name,surname}),
 }
 
 const authService = {
-    getAuth:(data: {email: string; password: string}) => axiosInstance.post<{ link: string }>(urls.auth.getAuth(), data)
+    getAuth:(data: {email: string; password: string}) => axiosInstance.post(urls.auth.getAuth(), data)
 }
 
 export {

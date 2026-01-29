@@ -34,8 +34,6 @@ const HeaderComponent = () => {
 
     }
 
-    console.log(user)
-
     return (
         <div>
             <header className={css.headerBox}>

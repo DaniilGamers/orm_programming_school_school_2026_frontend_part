@@ -12,7 +12,7 @@ export interface OrdersModel {
     alreadyPaid: number,
     created_date: string,
     utm: string,
-    msg: string[],
+    msg: string,
     status: string,
     manager: string,
     group: string

@@ -1,0 +1,84 @@
+.background{
+    background: rgb(0,0,0,0.5);
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    visibility: visible;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.background.visible{
+    background: rgb(0,0,0,0.5);
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    visibility: visible;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.createFormBox{
+    width: 20%;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    padding: 30px 10px 30px 10px;
+
+}
+
+.formBox{
+    width: 90%;
+    height: 30%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+}
+
+.inputBox{
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.inputBoxWrite
+{
+    padding: 15px;
+    width: 100%;
+    border-style: solid;
+    border-radius: 10px;
+    background: #eeeeee;
+    border-color: #eeeeee;
+    font-size: 14px;
+    border-width: 2px;
+    outline: none;
+    gap: 0;
+
+}
+
+.boxButtonsBoxMain{
+    width: 90%;
+}
+
+.boxButtonsBox{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.buttons{
+    padding: 10px;
+}
+
+.errorMsg{
+    text-align: left;
+}
