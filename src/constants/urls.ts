@@ -4,7 +4,9 @@ const urls = {
     orders: {
         getOrders: (filterLink: string): string => `/orders${filterLink}`,
         getGroups: (): string => `/orders/view_groups`,
-        getExcel:(): string => `/orders/export`
+        getExcel:(): string => `/orders/export`,
+        sendComment:(id: number): string => `/orders/send_comment/${id}/`,
+        getComments:(order_id: number): string => `/orders/view_comments/${order_id}/`
     },
     users:{
         getManagers: (filterLink: string): string => `/users/view_managerList${filterLink}`,

@@ -8,6 +8,8 @@ import {UserModel} from "../models/UserModel";
 import {GroupsPageModel} from "../models/GroupsPageModel";
 import {GroupsModel} from "../models/GroupsModel";
 import {ActivateModel} from "../models/activateModel";
+import {CommentPageModel} from "../models/commentPageModel";
+import {CommentModel} from "../models/commentModel";
 
 const axiosInstance = axios.create({
     baseURL: baseURL,
@@ -22,7 +24,10 @@ axiosInstance.interceptors.request.use(request => {
 const ordersService = {
     getOrders:(filterLink: string):IRes<OrdersPageModel<OrdersModel>> => axiosInstance.get(urls.orders.getOrders(filterLink)),
     getGroups:():IRes<GroupsPageModel<GroupsModel>> => axiosInstance.get(urls.orders.getGroups()),
-    getExcel:() => axiosInstance.get(urls.orders.getExcel(), {  responseType: "blob", withCredentials: true })
+    getExcel:() => axiosInstance.get(urls.orders.getExcel(), {  responseType: "blob", withCredentials: true }),
+    sendComment:(id: number, text: string) => axiosInstance.post(urls.orders.sendComment(id), { text }),
+    getComments: (orderId: number): IRes<CommentPageModel<CommentModel>> =>
+        axiosInstance.get(urls.orders.getComments(orderId))
 }
 
 const usersService = {

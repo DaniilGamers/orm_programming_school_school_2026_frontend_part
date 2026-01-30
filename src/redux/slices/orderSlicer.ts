@@ -2,11 +2,14 @@ import {OrdersModel} from "../../models/OrdersModel";
 import {createAsyncThunk, createSlice, isFulfilled} from "@reduxjs/toolkit";
 import {ordersService} from "../../services/api.services";
 import {GroupsModel} from "../../models/GroupsModel";
+import {CommentModel} from "../../models/commentModel";
 
 interface OrderSliceType {
     orders: OrdersModel[];
     count: number;
-    groups: GroupsModel[]
+    groups: GroupsModel[];
+    commentsByOrderId: Record<number, CommentModel[]>;
+    comments: CommentModel[];
     next: string;
     previous: string;
     results: number;
@@ -19,6 +22,8 @@ let orderInitState: OrderSliceType = {
     orders: [],
     count: 0,
     groups: [],
+    commentsByOrderId: [],
+    comments: [],
     next: '',
     previous: '',
     results: 0,
@@ -80,6 +85,31 @@ const getExcel = createAsyncThunk(
     }
 );
 
+const sendComment = createAsyncThunk(
+    'orderSlice/sendComment',
+    async ({ orderId, text }: { orderId: number; text: string }, thunkAPI)=> {
+        try {
+            const response = await ordersService.sendComment(orderId, text)
+            return thunkAPI.fulfillWithValue(response.data)
+        }catch (e) {
+            return thunkAPI.rejectWithValue("Something went wrong...");
+        }
+    }
+)
+
+const getComments = createAsyncThunk(
+    'orderSlice/getComments',
+    async (orderId: number, thunkAPI) => {
+        try {
+            const response = await ordersService.getComments(orderId); // fetch comments for this order
+            // return both orderId and results
+            return { orderId, results: response.data.results };
+        } catch (e) {
+            return thunkAPI.rejectWithValue("Something went wrong...");
+        }
+    }
+);
+
 const orderSlice = createSlice({
     name: 'orderSlice',
     initialState: orderInitState,
@@ -108,7 +138,21 @@ const orderSlice = createSlice({
             .addCase(getExcel.rejected, (state) => {
                 state.loading = false
             })
-            .addMatcher(isFulfilled(getOrders, getGroups, getExcel), (state) => {
+            .addCase(sendComment.fulfilled, (state, action) => {
+                state.loading = false;
+            })
+            .addCase(sendComment.rejected, (state) => {
+                state.loading = false
+            })
+            .addCase(getComments.fulfilled, (state, action) => {
+                state.loading = false;
+
+                state.comments = action.payload.results
+            })
+            .addCase(getComments.rejected, (state) => {
+                state.loading = false
+            })
+            .addMatcher(isFulfilled(getOrders, getGroups, getExcel, sendComment, getComments), (state) => {
                 state.loading = true;
             })
 })
@@ -118,7 +162,9 @@ const orderActions = {
     ...actions,
     getOrders,
     getGroups,
-    getExcel
+    getExcel,
+    sendComment,
+    getComments
 }
 
 export {

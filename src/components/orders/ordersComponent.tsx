@@ -6,19 +6,30 @@ import css from "./ordersComponent.module.css"
 import {userActions} from "../../redux/slices/userSlicer";
 import resetIcon from "../../assets/reset.51c9a5b2e5527c0bfbcaf74793deb908.svg"
 import fileIcon from "../../assets/xls.476bc5b02e8b94a61782636d19526309.svg"
+import PaginationComponent from "../pagination/paginationComponent";
 
 
 const OrdersComponent = () => {
 
+    const [page, setPage] = useState(1);
+
     const [searchParams, setSearchParams] = useSearchParams();
+
     const orderParam = searchParams.get('order') || '';
 
     const {orders} = useAppSelector((state) => state.order)
+
+    const count = useAppSelector((state) => state.order.count)
+
     const loading = useAppSelector((state) => state.order.loading)
+
     const {groups} = useAppSelector((state) => state.order)
+
     const {user} = useAppSelector((state) => state.user)
 
     const [expandedId, setExpandedId] = useState<number | null>(null);
+
+    const {comments} = useAppSelector((state) => state.order)
 
     const dispatch = useAppDispatch()
 
@@ -33,6 +44,11 @@ const OrdersComponent = () => {
         dispatch(orderActions.getGroups())
 
     }, [dispatch, query, filterString]);
+
+    const handleLoadComments = async (orderId: number) => {
+        const response = await dispatch(orderActions.getComments(orderId));
+        console.log(response.payload)
+    };
 
     const HandleOrderQuery = (key: string) => {
 
@@ -52,6 +68,8 @@ const OrdersComponent = () => {
         }
 
         setSearchParams(params);
+
+        setExpandedId(0)
 
     }
 
@@ -82,6 +100,8 @@ const OrdersComponent = () => {
 
         setSearchParams(params);
 
+        setExpandedId(0)
+
 
     }
 
@@ -103,11 +123,15 @@ const OrdersComponent = () => {
             params.set(qsName, name)
 
             setSearchParams(params);
+
+            setExpandedId(0)
         }
         else if(!checked){
             params.delete(qsName)
 
             setSearchParams(params);
+
+            setExpandedId(0)
         }
 
 
@@ -125,6 +149,8 @@ const OrdersComponent = () => {
 
         setSearchParams(newParams)
 
+        setExpandedId(0)
+
         window.location.reload()
 
 
@@ -134,6 +160,34 @@ const OrdersComponent = () => {
     const handleDownload = async () => {
 
         await dispatch(orderActions.getExcel())
+    }
+
+    const [text, setText] = useState<string>('')
+
+    const handleComment = (e: ChangeEvent<HTMLInputElement>) => {
+
+
+        const msgInput = e.target as HTMLInputElement
+        const msg = msgInput.value.toString()
+
+        if(msg.length < 1){
+            return
+        }else{
+            setText(msg)
+
+
+        }
+
+    }
+
+    const handleSubmitComment = async (e: FormEvent<HTMLFormElement>, id: number) => {
+        e.preventDefault()
+
+        if(text.length > 0){
+            await dispatch(orderActions.sendComment({orderId: id, text }))
+
+        }
+        await dispatch(orderActions.getComments(id));
     }
 
     const displayValue = (value?: string | number | null) => {
@@ -307,13 +361,16 @@ const OrdersComponent = () => {
 
                     {orders.map((order, index) => <tbody key={order.id}>
                     <tr style={{
-                        backgroundColor: index % 2 === 0 ? "white" : "lightgrey",
+                        backgroundColor: index % 2 === 0 ? "#f3f3f3" : "lightgrey",
                     }}
                         onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#76b852")}
                         onMouseLeave={(e) =>
                             (e.currentTarget.style.backgroundColor =
-                                index % 2 === 0 ? "white" : "lightgrey")}
-                        onClick={() => setExpandedId(expandedId === order.id ? null : order.id)}>
+                                index % 2 === 0 ? "#f3f3f3" : "lightgrey")}
+                        onClick={() => {
+                            setExpandedId(expandedId === order.id ? null : order.id)
+                            handleLoadComments(order.id)
+                        }}>
                         <td>{displayValue(order.id)}</td>
                         <td>{displayValue(order.name)}</td>
                         <td>{displayValue(order.surname)}</td>
@@ -332,23 +389,37 @@ const OrdersComponent = () => {
                     </tr>
                     {expandedId === order.id && (<tr key={order.id}>
                         <td colSpan={15} className={css.openWindowBox}
-                            style={{backgroundColor: index % 2 === 0 ? "white" : "lightgrey",}}
+                            style={{backgroundColor: index % 2 === 0 ? "#f3f3f3" : "lightgrey",}}
                         >
                             <div className={css.windowBox}>
                                 <div className={css.messageBox}>
                                     UTM: {displayValue(order.utm)}<br/>
                                     msg: {displayValue(order.msg)}
                                 </div>
-                                <div>
-                                    <div>
+                                <div className={css.commentBox}>
+                                    {comments.length === 0 ? ('') : (<div  key={order.id} className={css.commentView}>
 
-                                    </div>
-                                    <div>
-                                        <input type={"text"} placeholder={"Comment"}/>
-                                        <button>SUBMIT</button>
+                                        {comments
+                                            .filter(comment => comment.order_id === order.id)
+                                            .sort((a, b) => new Date(a.created_date).getTime() - new Date(b.created_date).getTime())
+                                            .map((comment, i) => (
+                                                <div key={comment.id} className={css.commentMsgBox} style={{borderBottom: i % 1 === 0 ? '1px solid #ccc' : 'none', paddingBottom: '8px'}}>
+                                                    <div>{comment.text}</div>
+                                                    <div>{comment.sender_name} {comment.created_date}</div>
+                                                </div>
+                                            ))}
+
+                                    </div>)}
+                                    <div className={css.commentInputBox}>
+                                        <form className={css.commentInputWindow} onSubmit={(e) => handleSubmitComment(e,order.id)}>
+                                            <label>
+                                                <input onChange={handleComment} type={"text"} placeholder={"Comment"}/>
+                                                <button>SUBMIT</button>
+                                            </label>
+                                        </form>
                                     </div>
                                 </div>
-                                <div>
+                                <div className={css.editBtnBox}>
                                     <button>EDIT</button>
                                 </div>
                             </div>
@@ -359,6 +430,8 @@ const OrdersComponent = () => {
 
                 </table>}
             </main>
+
+            <PaginationComponent currentPage={Number(page)} total_count={count} onPageChange={setPage}/>
         </div>
     );
 };

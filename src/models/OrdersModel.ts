@@ -15,5 +15,6 @@ export interface OrdersModel {
     msg: string,
     status: string,
     manager: string,
-    group: string
+    group: string,
+    comments_count: number
 }
