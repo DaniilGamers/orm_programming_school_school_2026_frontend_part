@@ -114,9 +114,11 @@ const AdminPanelComponent = () => {
         return managerStatus.total;
     };
 
-    const getNonZeroStatuses = (statusData?: StatusCount) => {
-        if (!statusData) return [];
-        return statusData.by_status.filter(s => s.total > 0);
+    const getNonZeroStatuses = (statusData?: StatusCount, statusName?: string) => {
+        if (!statusData || !statusName) return 0;
+
+        const statusObj = statusData.by_status.find(s => s.status === statusName);
+        return statusObj?.total ?? 0;
     };
 
     return (
@@ -151,10 +153,11 @@ const AdminPanelComponent = () => {
                              key={user.id}><div className={css.infoBox}>id: {user.id}<br/>email: {user.email}<br/>name: {user.name}<br/>surname: {user.surname}<br/>is_active: {String(user.is_active)}<br/>last_login: {String(user.last_login_display)}</div>
                         <div className={css.totalBox}>
                             <div> Total: {getManagerStatusTotal(user.name)}</div>
-                            <div>{getNonZeroStatuses(managerStatusCount[user.name]).map((s) => s.status === "In Work" && s.total > 0 ? (<div key={s.status}> In Work: {getManagerStatusTotal(user.name)}</div>) : null)}</div>
-                            <div>{getNonZeroStatuses(managerStatusCount[user.name]).map((s) => s.status === "Agree" && s.total > 0 ? (<div key={s.status}> In Work: {getManagerStatusTotal(user.name)}</div>) : null)}</div>
-                            <div>{getNonZeroStatuses(managerStatusCount[user.name]).map((s) => s.status === "Disagree" && s.total > 0 ? (<div key={s.status}> In Work: {getManagerStatusTotal(user.name)}</div>) : null)}</div>
-                            <div>{getNonZeroStatuses(managerStatusCount[user.name]).map((s) => s.status === "Dubbing" && s.total > 0 ? (<div key={s.status}> In Work: {getManagerStatusTotal(user.name)}</div>) : null)}</div>
+                            <div style={{display: "flex", flexDirection: "column"}}>
+                                {["In Work","Agree","Disagree","Dubbing"].map(status => {
+                                const total = getNonZeroStatuses(managerStatusCount[user.name], status);
+                                return total > 0 ? <div key={status}>{status}: {total}</div> : null;
+                            })}</div>
                         </div>
                         <div className={css.menuBox}>
                             <div className={css.mainButtonBox}>

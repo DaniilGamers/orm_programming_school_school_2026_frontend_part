@@ -77,14 +77,14 @@ const CreateManagerComponent = () => {
 
 
         if (!formList.name) {
-            newErrors.name = "Name required";
+            newErrors.name = "Min 1 character";
         } else if (formList.name.length < 1) {
             newErrors.name = "Min 1 character";
         }
 
 
         if (!formList.surname) {
-            newErrors.surname = "Surname required";
+            newErrors.surname = "Min 1 character";
         } else if (formList.surname.length < 1) {
             newErrors.surname = "Min 1 character";
         }

@@ -4,7 +4,6 @@ import {ordersService} from "../../services/api.services";
 import {GroupsModel} from "../../models/GroupsModel";
 import {CommentModel} from "../../models/commentModel";
 import {StatusSumModel} from "../../models/StatusSumModel";
-import {OrderEditModel} from "../../models/OrderEditModel";
 
 export interface StatusByStatus {
     status: string | null;
@@ -83,9 +82,9 @@ const getGroups = createAsyncThunk(
 
 const getExcel = createAsyncThunk(
     "orderSlice/getExcel",
-    async (_, thunkAPI) => {
+    async (filteredLink: string, thunkAPI) => {
         try {
-            const response = await ordersService.getExcel();
+            const response = await ordersService.getExcel(filteredLink);
 
 
             const url = window.URL.createObjectURL(response.data);
@@ -183,6 +182,7 @@ const orderSlice = createSlice({
         setOrder(state, action: PayloadAction<OrdersModel>) {
             state.order = action.payload;
         },
+
         clearOrder(state) {
             state.order = null;
         }
@@ -255,7 +255,7 @@ const orderSlice = createSlice({
             .addCase(editOrder.rejected, (state) => {
                 state.loading = false
             })
-            .addCase(addGroup.fulfilled, (state, action) => {
+            .addCase(addGroup.fulfilled, (state) => {
                 state.loading = false;
             })
             .addCase(addGroup.rejected, (state) => {

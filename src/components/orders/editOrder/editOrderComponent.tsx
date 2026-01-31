@@ -7,7 +7,7 @@ import {AppDispatch, useAppSelector} from "../../../redux/store/store";
 import {OrderEditModel} from "../../../models/OrderEditModel";
 const EditOrderComponent = () => {
 
-    const [errors, setErrors] = useState<{ name?: string }>({});
+    const [errors, setErrors] = useState<{ name?: string, email?: string }>({});
 
     const { activeMenu, closeMenu } = useCreateMenu();
 
@@ -28,7 +28,7 @@ const EditOrderComponent = () => {
     const { order } = useAppSelector(state => state.order);
 
     type EditOrderForm = {
-        manager: string | null; // always string
+        manager: string | null;
         status: string;
         group_id: string;
         name: string;
@@ -62,8 +62,10 @@ const EditOrderComponent = () => {
     useEffect(() => {
         if (!order) return;
 
+        const matchedGroup = groups.find(g => g.name === order.group);
+
         setForm({
-            group_id: group?.id ? String(group.id) : '',
+            group_id: matchedGroup ? String(matchedGroup.id) : '',
             status: order.status ?? '',
             manager: order.manager ?? '',
             name: order.name ?? '',
@@ -77,17 +79,17 @@ const EditOrderComponent = () => {
             courseType: order.course_type ?? '',
             courseFormat: order.course_format ?? ''
         });
-    }, [group?.id, order?.id, order]);
+    }, [groups, group?.id, order?.id, order]);
 
     useEffect(() => {
-        if (!errors.name) return;
+        if (!errors.name && !errors.email) return;
 
         const timer = setTimeout(() => {
             setErrors({});
         }, 3000); // 3 seconds
 
         return () => clearTimeout(timer); // cleanup
-    }, [errors.name]);
+    }, [errors.email, errors.name]);
 
     const handleAddGroup = (e: ChangeEvent<HTMLInputElement>) => {
         const group = e.target as HTMLInputElement
@@ -98,6 +100,7 @@ const EditOrderComponent = () => {
 
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -133,6 +136,21 @@ const EditOrderComponent = () => {
         else
         {
 
+            if (addGroup){
+                setGroupMenu(true)
+                return
+            }
+
+            if (!form.email) {
+                setErrors({ email: 'Email required' });
+
+                return
+            } else if (!emailRegex.test(form.email)) {
+                setErrors({ email: 'Invalid email format' });
+
+                return
+            }
+
             const payload: OrderEditModel['data'] = {
                 name: form.name,
                 surname: form.surname,
@@ -159,15 +177,16 @@ const EditOrderComponent = () => {
         }
 
 
-        setGroupMenu(true)
-
-
     }
     if (activeMenu !== 'order') return null;
 
     return (
-        <div className={css.background}>
-            <div className={css.editFormBox}>
+        <div className={css.background} onClick={() => {
+            setAddGroup(false)
+            setGroupMenu(false)
+            setErrors({})
+            closeMenu()}}>
+            <div className={css.editFormBox} onClick={(e) => e.stopPropagation()}>
                 <form className={css.formBox} onSubmit={handleSubmit} noValidate >
 
                     <div className={css.labelBox}>
@@ -214,8 +233,8 @@ const EditOrderComponent = () => {
                                         <option value={''}>All status</option>
                                         <option value={'In Work'}>In work</option>
                                         <option value={'New'}>New</option>
-                                        <option value={'Aggre'}>Aggre</option>
-                                        <option value={'Disable'}>Disable</option>
+                                        <option value={'Agree'}>Agree</option>
+                                        <option value={'Disagree'}>Disagree</option>
                                         <option value={'Dubbing'}>Dubbing</option>
                                     </select>
                                 </div>
@@ -252,6 +271,7 @@ const EditOrderComponent = () => {
 
                                 <span>Email</span>
                                 <input value={form.email} type={"email"} placeholder={"Email"} onChange={e => setForm({ ...form, email: e.target.value })}/>
+                                {errors.email && <span>{errors.email}</span>}
                             </div>
                             <div className={css.rowPartBox}>
                                 <span>Course</span>
@@ -308,7 +328,11 @@ const EditOrderComponent = () => {
 
                     <div className={css.optionBtnBox}>
 
-                        <button onClick={() => closeMenu()}>CLOSE</button>
+                        <button onClick={() => {
+                            setAddGroup(false)
+                            setGroupMenu(false)
+                            setErrors({})
+                            closeMenu()}}>CLOSE</button>
                         <button>SUBMIT</button>
 
                     </div>

@@ -16,25 +16,25 @@ axiosInstance.interceptors.request.use(request => {
     const token = localStorage.getItem('access')
     request.headers.set('Authorization', `Bearer ${token}`)
     return request
-}
+})
 
-// axiosInstance.interceptors.response.use(
-//     response => response,
-//     error => {
-//         if (error.response?.status === 401) {
-//
-//             localStorage.removeItem("access")
-//             localStorage.removeItem("refresh")
-//             window.location.href = '/login';
-//         }
-//         return Promise.reject(error);
-//     }
+axiosInstance.interceptors.response.use(
+     response => response,
+     error => {
+         if (error.response?.status === 401) {
+
+             localStorage.removeItem("access")
+             localStorage.removeItem("refresh")
+            window.location.href = '/loginExpSession=true';
+         }
+         return Promise.reject(error);
+     }
 );
 
 const ordersService = {
     getOrders:(filterLink: string):IRes<PageModel<OrdersModel>> => axiosInstance.get(urls.orders.getOrders(filterLink)),
     getGroups:() => axiosInstance.get(urls.orders.getGroups()),
-    getExcel:() => axiosInstance.get(urls.orders.getExcel(), {  responseType: "blob", withCredentials: true }),
+    getExcel:(filteredLink: string) => axiosInstance.get(urls.orders.getExcel(filteredLink), {  responseType: "blob", withCredentials: true }),
     sendComment:(id: number, text: string) => axiosInstance.post(urls.orders.sendComment(id), { text }),
     getComments: (orderId: number): IRes<PageModel<CommentModel>> => axiosInstance.get(urls.orders.getComments(orderId)),
     getStatusOrdersCount: (manager?: string): IRes<StatusSumModel> => axiosInstance.get(urls.orders.getStatusOrdersCount(manager || '')),

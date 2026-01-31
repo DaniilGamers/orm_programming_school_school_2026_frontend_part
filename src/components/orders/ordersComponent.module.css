@@ -230,5 +230,10 @@ th:hover{
 .editBtnBox>button{
     padding: 10px 20px 10px 20px;
 }
+.editBtnBox>button:disabled{
+    background: grey;
+    border-color: grey;
+    cursor: not-allowed;
+}
 
 

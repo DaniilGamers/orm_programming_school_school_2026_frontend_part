@@ -34,6 +34,8 @@ const OrdersComponent = () => {
 
     const [expandedId, setExpandedId] = useState<number | null>(null);
 
+    const [inputType, setInputType] = useState<'text' | 'date'>('text');
+
     const {comments} = useAppSelector((state) => state.order)
 
     const dispatch = useAppDispatch()
@@ -164,7 +166,9 @@ const OrdersComponent = () => {
 
     const handleDownload = async () => {
 
-        await dispatch(orderActions.getExcel())
+        const filterString = query.toString() ? `?${query.toString()}` : '';
+
+        await dispatch(orderActions.getExcel(filterString))
     }
 
     const [text, setText] = useState<string>('')
@@ -298,8 +302,8 @@ const OrdersComponent = () => {
                                     <option>All status</option>
                                     <option>In work</option>
                                     <option>New</option>
-                                    <option>Aggre</option>
-                                    <option>Disable</option>
+                                    <option>Agree</option>
+                                    <option>Disagree</option>
                                     <option>Dubbing</option>
                                 </select>
                             </label>
@@ -316,13 +320,13 @@ const OrdersComponent = () => {
 
                         <div>
                             <label>
-                                <input className={css.Inputs} type={'text'} placeholder={'Start date'} onFocus={(e) => e.target.type = "date"} onChange={handleChangeQuery}/>
+                                <input className={css.Inputs} type={inputType} placeholder={'Start date'} name={"start_date"} onFocus={() => setInputType('date')} onChange={handleChangeQuery}/>
                             </label>
                         </div>
 
                         <div>
                             <label>
-                                <input className={css.Inputs} type={'text'} placeholder={'End date'} onFocus={(e) => e.target.type = "date"} onChange={handleChangeQuery}/>
+                                <input className={css.Inputs} type={inputType} placeholder={'End date'} name={"end_date"} onFocus={() => setInputType('date')} onChange={handleChangeQuery}/>
                             </label>
                         </div>
 
@@ -434,7 +438,7 @@ const OrdersComponent = () => {
                                     </div>
                                 </div>
                                 <div className={css.editBtnBox}>
-                                    <button onClick={() =>
+                                    <button disabled={Boolean(order.manager && order.manager !== user?.name)} onClick={() =>
                                     {dispatch(orderActions.setOrder(order))
                                         openMenu('order')}}>EDIT</button>
                                 </div>
