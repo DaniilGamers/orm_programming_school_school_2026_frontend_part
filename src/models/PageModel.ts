@@ -1,4 +1,4 @@
-export interface CommentPageModel<T> {
+export interface PageModel<T> {
 
     count: number,
     next: string,

@@ -6,7 +6,10 @@ const urls = {
         getGroups: (): string => `/orders/view_groups`,
         getExcel:(): string => `/orders/export`,
         sendComment:(id: number): string => `/orders/send_comment/${id}/`,
-        getComments:(order_id: number): string => `/orders/view_comments/${order_id}/`
+        getComments:(order_id: number): string => `/orders/view_comments/${order_id}/`,
+        getStatusOrdersCount:(manager?: string): string => `/orders/order_status_count${manager ? `?manager=${manager}` : ''}`,
+        editOrder:(id: number): string => `/orders/edit_order/${id}/`,
+        addGroup:() => `/orders/add_group`,
     },
     users:{
         getManagers: (filterLink: string): string => `/users/view_managerList${filterLink}`,

@@ -1,4 +1,4 @@
 export interface GroupsModel {
     id: number;
-    name: number
+    name: string
 }

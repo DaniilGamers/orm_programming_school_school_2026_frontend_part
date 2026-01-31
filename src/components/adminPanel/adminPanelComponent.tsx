@@ -1,10 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from "../../redux/store/store";
-import {useSearchParams} from "react-router-dom";
 import {userActions} from "../../redux/slices/userSlicer";
 import css from "./adminPanel.module.css"
 import {useCreateMenu} from "../../redux/context/CreateMenuContext";
-import {orderActions} from "../../redux/slices/orderSlicer";
+import {orderActions, StatusCount} from "../../redux/slices/orderSlicer";
 
 const AdminPanelComponent = () => {
 
@@ -17,32 +16,38 @@ const AdminPanelComponent = () => {
     const {users} = useAppSelector((state) => state.user)
     const {user} = useAppSelector((state) => state.user)
 
-    //const {orders} = useAppSelector((state) => state.order)
+    const { statusSumCount, managerStatusCount } = useAppSelector((state) => state.order);
 
     const [link, setLink] = useState<Record<number, string>>({})
 
     const [copied, setCopied] = useState<Record<number, boolean>>({})
 
-    const [query] = useSearchParams()
-
-    const filterString = '?' + query.toString();
-
     useEffect(() => {
         dispatch(userActions.getManagers(''))
-        dispatch(orderActions.getOrders(''))
-    }, [dispatch,filterString]);
+        dispatch(orderActions.getStatusOrdersCount(''))
+
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (!user?.name) return;
+            // This won't overwrite global slice
+            users.forEach(u => {
+                dispatch(orderActions.getStatusOrdersCount(u.name))
+            });
+
+    }, [dispatch, user?.name, users]);
 
     const ban = async (id: number) =>  {
 
         await dispatch(userActions.banManager(id))
-        await dispatch(userActions.getManagers(filterString))
+        await dispatch(userActions.getManagers(''))
 
     }
 
     const unban = async (id: number) =>  {
 
         await dispatch(userActions.unbanManager(id))
-        await dispatch(userActions.getManagers(filterString))
+        await dispatch(userActions.getManagers(''))
 
     }
 
@@ -98,6 +103,22 @@ const AdminPanelComponent = () => {
 
     }
 
+    const getStatusTotal = (count: StatusCount | null, status?: any) => {
+        if (!count) return 0;
+        if (!status) return count.total;
+        return count.by_status.find(s => s.status === status)?.total ?? 0;
+    };
+    const getManagerStatusTotal = (managerName: string) => {
+        const managerStatus = managerStatusCount[managerName]; // get manager's count
+        if (!managerStatus) return 0; // no orders yet
+        return managerStatus.total;
+    };
+
+    const getNonZeroStatuses = (statusData?: StatusCount) => {
+        if (!statusData) return [];
+        return statusData.by_status.filter(s => s.total > 0);
+    };
+
     return (
 
         <div>
@@ -108,13 +129,12 @@ const AdminPanelComponent = () => {
                 <div className={css.statsHeader}>
                     <div className={css.statsHeaderBox}><p>Orders statistic</p></div>
                     <div className={css.statsTotalBox}>
-                        <p>total:</p>
-                        <p>In work:</p>
-                        <p>null:</p>
-                        <p>Agree:</p>
-                        <p>Disagree:</p>
-                        <p>Dubbing:</p>
-                        <p>New:</p>
+                        <p>total: {getStatusTotal(statusSumCount)}</p>
+                        <p>In work: {getStatusTotal(statusSumCount, "In Work")}</p>
+                        <p>Agree: {getStatusTotal(statusSumCount, "Agree")}</p>
+                        <p>Disagree: {getStatusTotal(statusSumCount, "Disagree")}</p>
+                        <p>Dubbing: {getStatusTotal(statusSumCount, "Dubbing")}</p>
+                        <p>New: {getStatusTotal(statusSumCount, "New")}</p>
                     </div>
 
                 </div>
@@ -129,7 +149,13 @@ const AdminPanelComponent = () => {
 
                     <section className={css.managerListBox}
                              key={user.id}><div className={css.infoBox}>id: {user.id}<br/>email: {user.email}<br/>name: {user.name}<br/>surname: {user.surname}<br/>is_active: {String(user.is_active)}<br/>last_login: {String(user.last_login_display)}</div>
-                        <div className={css.totalBox}><span>Total:</span></div>
+                        <div className={css.totalBox}>
+                            <div> Total: {getManagerStatusTotal(user.name)}</div>
+                            <div>{getNonZeroStatuses(managerStatusCount[user.name]).map((s) => s.status === "In Work" && s.total > 0 ? (<div key={s.status}> In Work: {getManagerStatusTotal(user.name)}</div>) : null)}</div>
+                            <div>{getNonZeroStatuses(managerStatusCount[user.name]).map((s) => s.status === "Agree" && s.total > 0 ? (<div key={s.status}> In Work: {getManagerStatusTotal(user.name)}</div>) : null)}</div>
+                            <div>{getNonZeroStatuses(managerStatusCount[user.name]).map((s) => s.status === "Disagree" && s.total > 0 ? (<div key={s.status}> In Work: {getManagerStatusTotal(user.name)}</div>) : null)}</div>
+                            <div>{getNonZeroStatuses(managerStatusCount[user.name]).map((s) => s.status === "Dubbing" && s.total > 0 ? (<div key={s.status}> In Work: {getManagerStatusTotal(user.name)}</div>) : null)}</div>
+                        </div>
                         <div className={css.menuBox}>
                             <div className={css.mainButtonBox}>
                                 <button

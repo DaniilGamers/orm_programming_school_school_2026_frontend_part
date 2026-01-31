@@ -1,15 +1,12 @@
 import axios from "axios";
 import {baseURL, urls} from "../constants/urls";
 import {IRes} from "../resType";
-import {OrdersPageModel} from "../models/OrdersPageModel";
+import {PageModel} from "../models/PageModel";
 import {OrdersModel} from "../models/OrdersModel";
-import {UsersPageModel} from "../models/UsersPageModel";
 import {UserModel} from "../models/UserModel";
-import {GroupsPageModel} from "../models/GroupsPageModel";
-import {GroupsModel} from "../models/GroupsModel";
 import {ActivateModel} from "../models/activateModel";
-import {CommentPageModel} from "../models/commentPageModel";
 import {CommentModel} from "../models/commentModel";
+import {StatusSumModel} from "../models/StatusSumModel";
 
 const axiosInstance = axios.create({
     baseURL: baseURL,
@@ -19,19 +16,34 @@ axiosInstance.interceptors.request.use(request => {
     const token = localStorage.getItem('access')
     request.headers.set('Authorization', `Bearer ${token}`)
     return request
-})
+}
+
+// axiosInstance.interceptors.response.use(
+//     response => response,
+//     error => {
+//         if (error.response?.status === 401) {
+//
+//             localStorage.removeItem("access")
+//             localStorage.removeItem("refresh")
+//             window.location.href = '/login';
+//         }
+//         return Promise.reject(error);
+//     }
+);
 
 const ordersService = {
-    getOrders:(filterLink: string):IRes<OrdersPageModel<OrdersModel>> => axiosInstance.get(urls.orders.getOrders(filterLink)),
-    getGroups:():IRes<GroupsPageModel<GroupsModel>> => axiosInstance.get(urls.orders.getGroups()),
+    getOrders:(filterLink: string):IRes<PageModel<OrdersModel>> => axiosInstance.get(urls.orders.getOrders(filterLink)),
+    getGroups:() => axiosInstance.get(urls.orders.getGroups()),
     getExcel:() => axiosInstance.get(urls.orders.getExcel(), {  responseType: "blob", withCredentials: true }),
     sendComment:(id: number, text: string) => axiosInstance.post(urls.orders.sendComment(id), { text }),
-    getComments: (orderId: number): IRes<CommentPageModel<CommentModel>> =>
-        axiosInstance.get(urls.orders.getComments(orderId))
+    getComments: (orderId: number): IRes<PageModel<CommentModel>> => axiosInstance.get(urls.orders.getComments(orderId)),
+    getStatusOrdersCount: (manager?: string): IRes<StatusSumModel> => axiosInstance.get(urls.orders.getStatusOrdersCount(manager || '')),
+    editOrder:(id: number, data: Record<string, any>) => axiosInstance.patch(urls.orders.editOrder(id) , data),
+    addGroup:(name: string) => axiosInstance.post(urls.orders.addGroup(), {name}),
 }
 
 const usersService = {
-    getManagers:(filterLink: string):IRes<UsersPageModel<UserModel>> => axiosInstance.get(urls.users.getManagers(filterLink)),
+    getManagers:(filterLink: string):IRes<PageModel<UserModel>> => axiosInstance.get(urls.users.getManagers(filterLink)),
     getManagerName:():IRes<UserModel> => axiosInstance.get(urls.users.getManagerName()),
     SetPassword:(token: string, password: string, confirm_password: string) => axiosInstance.post(urls.users.SetPassword(token), { password, confirm_password }),
     banManager:(id: number) => axiosInstance.patch(urls.users.BanManager(id)),

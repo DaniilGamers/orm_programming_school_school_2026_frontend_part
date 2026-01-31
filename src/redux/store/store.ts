@@ -17,6 +17,8 @@ export type RootState = ReturnType<typeof store.getState>;
 export const useAppDispatch = useDispatch.withTypes<typeof store.dispatch>();
 export const useAppSelector = useSelector.withTypes<ReturnType<typeof store.getState>>();
 
+export type AppDispatch = typeof store.dispatch;
+
 export {
     store
 }

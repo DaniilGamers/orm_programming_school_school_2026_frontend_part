@@ -7,9 +7,14 @@ import {userActions} from "../../redux/slices/userSlicer";
 import resetIcon from "../../assets/reset.51c9a5b2e5527c0bfbcaf74793deb908.svg"
 import fileIcon from "../../assets/xls.476bc5b02e8b94a61782636d19526309.svg"
 import PaginationComponent from "../pagination/paginationComponent";
+import {useCreateMenu} from "../../redux/context/CreateMenuContext";
 
 
 const OrdersComponent = () => {
+
+    const { openMenu } = useCreateMenu()
+
+    const [errors, setErrors] = useState<string>('')
 
     const [page, setPage] = useState(1);
 
@@ -171,8 +176,10 @@ const OrdersComponent = () => {
         const msg = msgInput.value.toString()
 
         if(msg.length < 1){
-            return
+            setErrors("Min 1 char")
+            setText('')
         }else{
+            setErrors('')
             setText(msg)
 
 
@@ -188,6 +195,11 @@ const OrdersComponent = () => {
 
         }
         await dispatch(orderActions.getComments(id));
+
+        dispatch(orderActions.getOrders(filterString))
+
+        setText('')
+
     }
 
     const displayValue = (value?: string | number | null) => {
@@ -304,13 +316,13 @@ const OrdersComponent = () => {
 
                         <div>
                             <label>
-                                <input className={css.Inputs} type={'text'} placeholder={'Start date'} onChange={handleChangeQuery}/>
+                                <input className={css.Inputs} type={'text'} placeholder={'Start date'} onFocus={(e) => e.target.type = "date"} onChange={handleChangeQuery}/>
                             </label>
                         </div>
 
                         <div>
                             <label>
-                                <input className={css.Inputs} type={'text'} placeholder={'End date'} onChange={handleChangeQuery}/>
+                                <input className={css.Inputs} type={'text'} placeholder={'End date'} onFocus={(e) => e.target.type = "date"} onChange={handleChangeQuery}/>
                             </label>
                         </div>
 
@@ -368,8 +380,8 @@ const OrdersComponent = () => {
                             (e.currentTarget.style.backgroundColor =
                                 index % 2 === 0 ? "#f3f3f3" : "lightgrey")}
                         onClick={() => {
-                            setExpandedId(expandedId === order.id ? null : order.id)
-                            handleLoadComments(order.id)
+                            setExpandedId(expandedId === order.id ? null : order.id);
+                            handleLoadComments(order.id).then()
                         }}>
                         <td>{displayValue(order.id)}</td>
                         <td>{displayValue(order.name)}</td>
@@ -413,14 +425,18 @@ const OrdersComponent = () => {
                                     <div className={css.commentInputBox}>
                                         <form className={css.commentInputWindow} onSubmit={(e) => handleSubmitComment(e,order.id)}>
                                             <label>
-                                                <input onChange={handleComment} type={"text"} placeholder={"Comment"}/>
-                                                <button>SUBMIT</button>
+                                                <input value={text} minLength={1} onChange={handleComment} type={"text"} placeholder={"Comment"} />
+                                                {errors.length === 0 ? '' : (<span>{errors}</span>)}
                                             </label>
+                                                <button>SUBMIT</button>
+
                                         </form>
                                     </div>
                                 </div>
                                 <div className={css.editBtnBox}>
-                                    <button>EDIT</button>
+                                    <button onClick={() =>
+                                    {dispatch(orderActions.setOrder(order))
+                                        openMenu('order')}}>EDIT</button>
                                 </div>
                             </div>
                         </td>

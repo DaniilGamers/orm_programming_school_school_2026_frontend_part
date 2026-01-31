@@ -129,7 +129,7 @@ th:hover{
     gap: 10px;
     width: 100%;
     color: black;
-    padding: 10px;
+    padding: 20px 5px 20px 5px;
     border-radius: 4px;
 }
 
@@ -146,6 +146,7 @@ th:hover{
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    gap: 10px;
 }
 .commentView{
     background: white;
@@ -179,15 +180,17 @@ th:hover{
     align-items: center;
     padding: 10px;
     border-radius: 10px;
+    gap: 10px;
 }
 
 .commentInputWindow>label{
     display: flex;
     width: 100%;
     gap: 10px;
+    flex-direction: column;
 }
 
-.commentInputWindow>label>button{
+.commentInputWindow>button{
     padding: 15px;
     background: grey;
     border-color: grey;

@@ -1,15 +1,36 @@
 import {OrdersModel} from "../../models/OrdersModel";
-import {createAsyncThunk, createSlice, isFulfilled} from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice, isFulfilled, PayloadAction} from "@reduxjs/toolkit";
 import {ordersService} from "../../services/api.services";
 import {GroupsModel} from "../../models/GroupsModel";
 import {CommentModel} from "../../models/commentModel";
+import {StatusSumModel} from "../../models/StatusSumModel";
+import {OrderEditModel} from "../../models/OrderEditModel";
+
+export interface StatusByStatus {
+    status: string | null;
+    total: number;
+}
+
+export interface StatusCount {
+    total: number;
+    by_status: StatusByStatus[];
+}
+
+interface GetStatusPayload {
+    data: StatusCount;
+    manager?: string;
+}
 
 interface OrderSliceType {
     orders: OrdersModel[];
+    order: OrdersModel | null;
     count: number;
     groups: GroupsModel[];
+    group: GroupsModel | null;
     commentsByOrderId: Record<number, CommentModel[]>;
     comments: CommentModel[];
+    statusSumCount: StatusSumModel | null,
+    managerStatusCount: Record<string, StatusCount>;
     next: string;
     previous: string;
     results: number;
@@ -20,10 +41,14 @@ interface OrderSliceType {
 
 let orderInitState: OrderSliceType = {
     orders: [],
+    order: null,
     count: 0,
     groups: [],
-    commentsByOrderId: [],
+    group: null,
+    commentsByOrderId: {},
     comments: [],
+    statusSumCount: null,
+    managerStatusCount: {},
     next: '',
     previous: '',
     results: 0,
@@ -110,10 +135,58 @@ const getComments = createAsyncThunk(
     }
 );
 
+const editOrder = createAsyncThunk(
+    'orderSlice/editOrder',
+    async ( { id, ...data }: Record<string, any> & { id: number }, thunkAPI) => {
+        try {
+            const response = await ordersService.editOrder(id,data)
+            return thunkAPI.fulfillWithValue(response.data)
+        }catch (e) {
+            return thunkAPI.rejectWithValue("Something went wrong...");
+        }
+    }
+)
+
+const addGroup = createAsyncThunk(
+    'orderSlice/addGroup',
+    async ({name}: {name: string}, thunkAPI) => {
+        try {
+            const response = await ordersService.addGroup(name)
+            return thunkAPI.fulfillWithValue(response.data)
+        }catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response?.data?.detail || "Failed to create manager");
+        }
+    }
+)
+
+const getStatusOrdersCount = createAsyncThunk<
+    GetStatusPayload,
+    string | undefined
+
+>(
+    'orderSlice/getStatusOrdersCount',
+    async (manager, thunkAPI) => {
+        try {
+            const response = await ordersService.getStatusOrdersCount(manager)
+            return thunkAPI.fulfillWithValue({data: response.data, manager})
+        }catch (e) {
+            return thunkAPI.rejectWithValue("Something went wrong...");
+        }
+    }
+)
+
+
 const orderSlice = createSlice({
     name: 'orderSlice',
     initialState: orderInitState,
-    reducers: {},
+    reducers: {
+        setOrder(state, action: PayloadAction<OrdersModel>) {
+            state.order = action.payload;
+        },
+        clearOrder(state) {
+            state.order = null;
+        }
+    },
     extraReducers: builder =>
         builder
             .addCase(getOrders.fulfilled, (state, action) => {
@@ -127,18 +200,20 @@ const orderSlice = createSlice({
             })
             .addCase(getGroups.fulfilled, (state, action) => {
                 state.loading = false;
-                state.groups = action.payload.results
+                state.groups = action.payload
+
+                state.group = action.payload
             })
             .addCase(getGroups.rejected, (state) => {
                 state.loading = false
             })
-            .addCase(getExcel.fulfilled, (state, action) => {
+            .addCase(getExcel.fulfilled, (state) => {
                 state.loading = false;
             })
             .addCase(getExcel.rejected, (state) => {
                 state.loading = false
             })
-            .addCase(sendComment.fulfilled, (state, action) => {
+            .addCase(sendComment.fulfilled, (state) => {
                 state.loading = false;
             })
             .addCase(sendComment.rejected, (state) => {
@@ -152,7 +227,41 @@ const orderSlice = createSlice({
             .addCase(getComments.rejected, (state) => {
                 state.loading = false
             })
-            .addMatcher(isFulfilled(getOrders, getGroups, getExcel, sendComment, getComments), (state) => {
+            .addCase(getStatusOrdersCount.fulfilled, (state, action) => {
+                state.loading = false;
+
+                const normalized: StatusSumModel = {
+                    total: action.payload.data.total,
+                    by_status: action.payload.data.by_status.map(s => ({
+                        status: s.status ?? "null",  // 🔹 convert null → string
+                        total: s.total
+                    }))
+                }
+
+                if (action.payload.manager) {
+                    state.managerStatusCount[action.payload.manager] = action.payload.data;
+                } else {
+                    state.statusSumCount = normalized;
+                }
+
+
+            })
+            .addCase(getStatusOrdersCount.rejected, (state) => {
+                state.loading = false
+            })
+            .addCase(editOrder.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(editOrder.rejected, (state) => {
+                state.loading = false
+            })
+            .addCase(addGroup.fulfilled, (state, action) => {
+                state.loading = false;
+            })
+            .addCase(addGroup.rejected, (state) => {
+                state.loading = false
+            })
+            .addMatcher(isFulfilled(getOrders, getGroups, getExcel, sendComment, getComments, getStatusOrdersCount, addGroup, editOrder), (state) => {
                 state.loading = true;
             })
 })
@@ -164,7 +273,10 @@ const orderActions = {
     getGroups,
     getExcel,
     sendComment,
-    getComments
+    getComments,
+    getStatusOrdersCount,
+    addGroup,
+    editOrder
 }
 
 export {
