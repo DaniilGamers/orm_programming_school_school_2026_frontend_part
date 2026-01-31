@@ -2,7 +2,7 @@
 
 npm start or serve -s build
 
-Recommend to use serve -s build
+Recommend to use: serve -s build
 
 ### Important notice
 
