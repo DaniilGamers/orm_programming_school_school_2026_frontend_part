@@ -43,7 +43,7 @@ const ordersService = {
 }
 
 const usersService = {
-    getManagers:(filterLink: string):IRes<PageModel<UserModel>> => axiosInstance.get(urls.users.getManagers(filterLink)),
+    getManagers:():IRes<PageModel<UserModel>> => axiosInstance.get(urls.users.getManagers()),
     getManagerName:():IRes<UserModel> => axiosInstance.get(urls.users.getManagerName()),
     SetPassword:(token: string, password: string, confirm_password: string) => axiosInstance.post(urls.users.SetPassword(token), { password, confirm_password }),
     banManager:(id: number) => axiosInstance.patch(urls.users.BanManager(id)),

@@ -23,7 +23,7 @@ const AdminPanelComponent = () => {
     const [copied, setCopied] = useState<Record<number, boolean>>({})
 
     useEffect(() => {
-        dispatch(userActions.getManagers(''))
+        dispatch(userActions.getManagers())
         dispatch(orderActions.getStatusOrdersCount(''))
 
     }, [dispatch]);
@@ -40,14 +40,14 @@ const AdminPanelComponent = () => {
     const ban = async (id: number) =>  {
 
         await dispatch(userActions.banManager(id))
-        await dispatch(userActions.getManagers(''))
+        await dispatch(userActions.getManagers())
 
     }
 
     const unban = async (id: number) =>  {
 
         await dispatch(userActions.unbanManager(id))
-        await dispatch(userActions.getManagers(''))
+        await dispatch(userActions.getManagers())
 
     }
 

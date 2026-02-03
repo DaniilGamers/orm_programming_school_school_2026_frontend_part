@@ -97,7 +97,7 @@ const CreateManagerComponent = () => {
 
 
         await dispatch(userActions.createManager(formList));
-        await dispatch(userActions.getManagers(''));
+        await dispatch(userActions.getManagers());
 
         setFormList({ email: '', name: '', surname: '' });
         setErrors({});

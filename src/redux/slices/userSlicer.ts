@@ -28,9 +28,9 @@ let userInitState: UserSliceType = {
 
 const getManagers = createAsyncThunk(
     'userSlice/loadManagers',
-    async (filterLink: string, thunkAPI) => {
+    async (_, thunkAPI) => {
         try {
-            const response = await usersService.getManagers(filterLink)
+            const response = await usersService.getManagers()
             return thunkAPI.fulfillWithValue(response.data)
         }
         catch (e) {
