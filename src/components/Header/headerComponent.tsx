@@ -40,7 +40,7 @@ const HeaderComponent = () => {
 
                     <div>
 
-                    <h2 onClick={() => {navigate('/orders')}}>Logo</h2>
+                    <h2 onClick={() => {navigate('/orders?page=1')}}>Logo</h2>
 
                     </div>
 

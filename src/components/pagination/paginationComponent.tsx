@@ -12,7 +12,7 @@ const PaginationComponent: React.FC<Props> = ({currentPage, total_count, onPageC
 
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const pageParam = Number(searchParams.get("page")) || 1
+    const pageParam = Number(searchParams.get("page")) || 1;
 
     const [page, setPage] = useState(pageParam);
 
@@ -20,18 +20,17 @@ const PaginationComponent: React.FC<Props> = ({currentPage, total_count, onPageC
     const totalPages = Math.ceil(total_count / pageSize)
 
     useEffect(() => {
+        setPage(currentPage);
+    }, [currentPage]);
+
+    useEffect(() => {
+
         const params = new URLSearchParams(window.location.search);
 
-        if(searchParams.get("page")){
-            params.set('page', page.toString());
-            setSearchParams(params)
-            window.history.replaceState(
-                null,
-                '',
-                `${window.location.pathname}?${params.toString()}`
-            );
-        }
-    }, [searchParams,setSearchParams,page]);
+        params.set('page', page.toString());
+        setSearchParams(params)
+
+    }, [setSearchParams,page]);
 
     const WINDOW = 7;
     const half = Math.floor(WINDOW / 2);
@@ -73,21 +72,30 @@ const PaginationComponent: React.FC<Props> = ({currentPage, total_count, onPageC
 
     return (
         <div>
-            {!searchParams.get("page") ? '' : (<div className={css.pageButtonsMenu}>{pages.map((p, i) => (
+            {<div className={css.pageButtonsMenu}>{pages.map((p, i) => (
                 <button
                     key={i}
                     disabled={p === '...'}
-                    className={p === page ? 'active' : ''}
+                    className={typeof p === 'number' && p === page ? css.activeButton : ''}
                     onClick={() => {
-                        if (p === '<') setPage(page - 1);
-                        else if (p === '>') setPage(page + 1);
-                        else if (typeof p === 'number') setPage(p);
+                        if (p === '<') {
+                            setPage(page - 1)
+                            onPageChange(page - 1)
+                        }
+                        else if (p === '>') {
+                            setPage(page + 1)
+                            onPageChange(page + 1)
+                        }
+                        else if (typeof p === 'number') {
+                            setPage(p)
+                            onPageChange(p)
+                        }
                     }}
                 >
                     {p}
                 </button>)
             )}
-            </div>)}
+            </div>}
         </div>
     );
 };

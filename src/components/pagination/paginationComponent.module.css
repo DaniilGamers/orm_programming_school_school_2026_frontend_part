@@ -5,6 +5,7 @@
     gap: 10px;
     justify-content: center;
     padding: 20px;
+    background: white;
 
 }
 
@@ -23,4 +24,9 @@
     font-size:  20px;
     padding: 5px 10px 5px 10px;
     border-radius: 30px
+}
+
+.pageButtonsMenu>.activeButton{
+    background: #43a047;
+    border-color: #43a047;
 }

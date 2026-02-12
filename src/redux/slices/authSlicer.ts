@@ -29,6 +29,22 @@ export const login = createAsyncThunk(
     }
 )
 
+export const refresh = createAsyncThunk(
+    "authSlice/refresh",
+    async (data: { refresh: string }, { rejectWithValue } ) => {
+        try {
+            const response = await authService.getRefresh(data)
+            localStorage.setItem('access', response.data.access)
+            return response.data
+        }
+        catch (err: any){
+            return rejectWithValue(err.response?.data);
+        }
+
+
+    }
+)
+
 const authSlice = createSlice({
         name: 'authSlice',
         initialState: initialState,
@@ -42,6 +58,13 @@ const authSlice = createSlice({
                 })
                 .addCase(login.pending, (state) => {
                     state.loading = true;
+                })
+                .addCase(refresh.fulfilled, (state)=>{
+                    state.loading = false;
+                    state.error = null
+                })
+                .addCase(refresh.rejected, (state) => {
+                    state.loading = false;
                 })
                 .addCase(login.rejected, (state, action) => {
                     state.loading = false;
@@ -60,7 +83,8 @@ const {reducer: authReducer, actions} = authSlice
 
 const authActions = {
     ...actions,
-    login
+    login,
+    refresh
 }
 
 export {

@@ -61,7 +61,9 @@ const OrdersComponent = () => {
 
         const params = new URLSearchParams(searchParams);
 
-        if (!params.has('page')) params.set('page', '1');
+        params.set('page', '1');
+
+        setPage(1)
 
         if (orderParam === key) {
 
@@ -82,8 +84,13 @@ const OrdersComponent = () => {
 
     const handleChangeQuery = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 
+        e.preventDefault()
+
         const params = new URLSearchParams(searchParams);
         params.set('page', '1');
+
+        setPage(1)
+
         const target = e.target;
         if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement)) return;
         const name = target.name || (target instanceof HTMLInputElement ? target.placeholder : '');
@@ -125,7 +132,7 @@ const OrdersComponent = () => {
 
         if(checked){
 
-            if (!params.has('page')) params.set('page', '1');
+            params.set('page', '1');
 
             params.set(qsName, name)
 
@@ -153,6 +160,8 @@ const OrdersComponent = () => {
         setSearchParams(resetParams)
 
         let newParams = '?page=1&order=-id'
+
+        setPage(1)
 
         setSearchParams(newParams)
 
@@ -225,7 +234,7 @@ const OrdersComponent = () => {
                         <div>
 
                             <label className={css.InputsLabel}>
-                                <input onChange={handleChangeQuery} className={css.Inputs} type={'text'} placeholder={'name'}/>
+                                <input onChange={handleChangeQuery} className={css.Inputs} type={'text'} placeholder={'name'} value={`${query.get("name") || ''}`}/>
                             </label>
 
                         </div>
@@ -233,21 +242,21 @@ const OrdersComponent = () => {
                         <div>
 
                             <label>
-                                <input onChange={handleChangeQuery} className={css.Inputs} type={'text'} placeholder={'surname'}/>
+                                <input onChange={handleChangeQuery} className={css.Inputs} type={'text'} placeholder={'surname'} value={`${query.get("surname") || ''}`}/>
                             </label>
 
                         </div>
 
                         <div>
                             <label>
-                                <input onChange={handleChangeQuery} className={css.Inputs} type={'text'} placeholder={'email'}/>
+                                <input onChange={handleChangeQuery} className={css.Inputs} type={'text'} placeholder={'email'} value={`${query.get("email") || ''}`}/>
                             </label>
 
                         </div>
 
                         <div>
                             <label>
-                                <input onChange={handleChangeQuery} className={css.Inputs} type={'text'} placeholder={'phone'}/>
+                                <input onChange={handleChangeQuery} className={css.Inputs} type={'text'} placeholder={'phone'} value={`${query.get("phone") || ''}`}/>
                             </label>
 
                         </div>
@@ -255,14 +264,14 @@ const OrdersComponent = () => {
                         <div>
 
                             <label>
-                                <input onChange={handleChangeQuery} className={css.Inputs} type={'text'} placeholder={'age'}/>
+                                <input onChange={handleChangeQuery} className={css.Inputs} type={'text'} placeholder={'age'} value={`${query.get("age") || ''}`}/>
                             </label>
 
                         </div>
 
                         <div>
                             <label>
-                                <select name={"course"}  className={css.Inputs} onChange={handleChangeQuery}>
+                                <select name={"course"}  className={css.Inputs} onChange={handleChangeQuery} value={`${query.get("course") || ''}`}>
                                     <option>All courses</option>
                                     <option>FS</option>
                                     <option>QACX</option>
@@ -276,7 +285,7 @@ const OrdersComponent = () => {
 
                         <div>
                             <label>
-                                <select name={"course_format"} className={css.Inputs} onChange={handleChangeQuery}>
+                                <select name={"course_format"} className={css.Inputs} onChange={handleChangeQuery} value={`${query.get("course_format") || ''}`}>
                                     <option>All formats</option>
                                     <option>static</option>
                                     <option>online</option>
@@ -286,7 +295,7 @@ const OrdersComponent = () => {
 
                         <div>
                             <label>
-                                <select name={"course_type"} className={css.Inputs} onChange={handleChangeQuery}>
+                                <select name={"course_type"} className={css.Inputs} onChange={handleChangeQuery} value={`${query.get("course_type") || ''}`}>
                                     <option>All types</option>
                                     <option>pro</option>
                                     <option>minimal</option>
@@ -298,7 +307,7 @@ const OrdersComponent = () => {
 
                         <div>
                             <label>
-                                <select name={"status"} className={css.Inputs} onChange={handleChangeQuery}>
+                                <select name={"status"} className={css.Inputs} onChange={handleChangeQuery} value={`${query.get("status") || ''}`}>
                                     <option>All status</option>
                                     <option>In work</option>
                                     <option>New</option>
@@ -311,7 +320,7 @@ const OrdersComponent = () => {
 
                         <div>
                             <label>
-                                <select name={"group"} className={css.Inputs} onChange={handleChangeQuery}>
+                                <select name={"group"} className={css.Inputs} onChange={handleChangeQuery} value={`${query.get("group") || ''}`}>
                                     <option>All groups</option>
                                     {groups.map((group) => <option key={group.id}>{group.name}</option>)}
                                 </select>
@@ -320,13 +329,13 @@ const OrdersComponent = () => {
 
                         <div>
                             <label>
-                                <input className={css.Inputs} type={inputType} placeholder={'Start date'} name={"start_date"} onFocus={() => setInputType('date')} onChange={handleChangeQuery}/>
+                                <input className={css.Inputs} type={inputType} placeholder={'Start date'} name={"start_date"} onFocus={() => setInputType('date')} onChange={handleChangeQuery} value={`${query.get("start_date") || ''}`}/>
                             </label>
                         </div>
 
                         <div>
                             <label>
-                                <input className={css.Inputs} type={inputType} placeholder={'End date'} name={"end_date"} onFocus={() => setInputType('date')} onChange={handleChangeQuery}/>
+                                <input className={css.Inputs} type={inputType} placeholder={'End date'} name={"end_date"} onFocus={() => setInputType('date')} onChange={handleChangeQuery} value={`${query.get("end_date") || ''}`}/>
                             </label>
                         </div>
 

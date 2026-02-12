@@ -7,6 +7,7 @@ import {UserModel} from "../models/UserModel";
 import {ActivateModel} from "../models/activateModel";
 import {CommentModel} from "../models/commentModel";
 import {StatusSumModel} from "../models/StatusSumModel";
+import {useNavigate} from "react-router-dom";
 
 const axiosInstance = axios.create({
     baseURL: baseURL,
@@ -23,9 +24,11 @@ axiosInstance.interceptors.response.use(
      error => {
          if (error.response?.status === 401) {
 
+             const navigate = useNavigate()
+
              localStorage.removeItem("access")
              localStorage.removeItem("refresh")
-            window.location.href = '/loginExpSession=true';
+            navigate('/loginExpSession=true');
          }
          return Promise.reject(error);
      }
@@ -53,7 +56,8 @@ const usersService = {
 }
 
 const authService = {
-    getAuth:(data: {email: string; password: string}) => axiosInstance.post(urls.auth.getAuth(), data)
+    getAuth:(data: {email: string; password: string}) => axiosInstance.post(urls.auth.getAuth(), data),
+    getRefresh:(data: {refresh: string}) => axiosInstance.post(urls.auth.getRefresh(), data)
 }
 
 export {

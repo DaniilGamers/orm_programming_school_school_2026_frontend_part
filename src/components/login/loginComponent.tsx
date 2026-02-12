@@ -82,56 +82,28 @@ const LoginComponent = () => {
 
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
+        e.preventDefault(); // <--- блокування дефолтного reload
 
         const newErrors: typeof errors = {};
+        if (!email) newErrors.email = "Min 1 char";
+        if (!password) newErrors.password = "Password is required";
 
-        if(email.length < 1){
-
-            newErrors.email = "Min 1 char"
-
-        }
-
-        if(!password){
-
-            newErrors.password = "Password is required"
-
-        }
-
-        if (password){
-
-            newErrors.password = ""
-
-            if (Object.keys(newErrors).length > 0) {
-                setErrors(newErrors);
-            }
-        }
-        else
-        {
-
-        }
-
-        if(password && email) {
-
-            String(password)
-
-            await dispatch(authActions.login({email, password})).unwrap()
-
-            setEmail("")
-
-            setPassword("")
-
-            if (errors)
-
-            navigate(`/orders`)
-
-        }
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             return;
         }
 
-    }
+        try {
+            await dispatch(authActions.login({ email, password })).unwrap();
+            setEmail("");
+            setPassword("");
+            setErrors({});
+            navigate("/orders?page=1"); // SPA навігація
+        } catch (err: any) {
+            // ловимо будь-яку помилку і не кидаємо далі
+            setErrors({ general: err?.message || "Login failed" });
+        }
+    };
 
     return (
         <div className={css.BG}>
@@ -150,7 +122,7 @@ const LoginComponent = () => {
                         {errors?.password && (<span className={css.errorMsg}>{errors.password}</span>)}
                         {error && (<span className={css.errorMsg}>{error}</span>)}
                     </label><br/>
-                        <button className={css.buttonLogin} disabled={loading}>{loading ? "LOADING...": 'LOGIN'}</button>
+                        <button type={"submit"} className={css.buttonLogin} disabled={loading}>{loading ? "LOADING...": 'LOGIN'}</button>
                 </form>
             </main>
         </div>
