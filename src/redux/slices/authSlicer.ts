@@ -34,7 +34,13 @@ export const refresh = createAsyncThunk(
     async (data: { refresh: string }, { rejectWithValue } ) => {
         try {
             const response = await authService.getRefresh(data)
-            localStorage.setItem('access', response.data.access)
+            if (!localStorage.getItem("access")) {
+                localStorage.setItem('access', response.data.access)
+                window.location.replace('orders?page=1')
+            }
+            else{
+                localStorage.setItem('access', response.data.access)
+            }
             return response.data
         }
         catch (err: any){

@@ -5,6 +5,7 @@ import adminIcon from '../../assets/admin.c305133bad8700df7d8be698c350c2bb.svg'
 import logOutIcon from '../../assets/logOut.7e73deefd22b4062b49d7ed47c46a9e1.svg'
 import {useAppDispatch, useAppSelector} from "../../redux/store/store";
 import {userActions} from "../../redux/slices/userSlicer";
+import {authActions} from "../../redux/slices/authSlicer";
 
 
 const HeaderComponent = () => {
@@ -22,8 +23,17 @@ const HeaderComponent = () => {
     const filterString = '?' + query.toString();
 
     useEffect(() => {
+
+        if(localStorage.getItem("refresh"))
+        {
+            const token = String(localStorage.getItem("refresh"))
+            dispatch(authActions.refresh({ refresh: token }))
+
+        }
+
         dispatch(userActions.getManagerName())
-    }, [dispatch, filterString]);
+
+    }, [navigate,dispatch, filterString]);
 
     function logOut() {
 
@@ -38,9 +48,11 @@ const HeaderComponent = () => {
         <div>
             <header className={css.headerBox}>
 
-                    <div>
+                    <div className={css.figureBox}>
 
-                    <h2 onClick={() => {navigate('/orders?page=1')}}>Logo</h2>
+                        <h2 onClick={() => {navigate('/orders?page=1')}}>Logo</h2>
+
+                        <button onClick={() => {navigate('/orders?page=1')}}>ORDERS</button>
 
                     </div>
 

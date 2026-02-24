@@ -1,7 +1,7 @@
 import React, {ChangeEvent, useState} from 'react';
 import css from './createManager.module.css'
 import {useCreateMenu} from "../../../redux/context/CreateMenuContext";
-import {useAppDispatch} from "../../../redux/store/store";
+import {useAppDispatch, useAppSelector} from "../../../redux/store/store";
 import {userActions} from "../../../redux/slices/userSlicer";
 
 const CreateManagerComponent = () => {
@@ -11,6 +11,8 @@ const CreateManagerComponent = () => {
         name?: string;
         surname?: string;
     }>({});
+
+    const {users} = useAppSelector((state) => state.user)
 
     const { activeMenu, closeMenu } = useCreateMenu();
 
@@ -69,10 +71,14 @@ const CreateManagerComponent = () => {
 
         const newErrors: typeof errors = {};
 
+        const emailSet = new Set(users.map(user => user.email))
+
         if (!formList.email) {
             newErrors.email = "Email required";
         } else if (!emailRegex.test(formList.email)) {
             newErrors.email = "Invalid email format";
+        }else if (emailSet.has(formList.email)){
+            newErrors.email = "This email exist";
         }
 
 

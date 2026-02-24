@@ -11,7 +11,13 @@
 
 .figureBox
 {
-
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+.figureBox>button{
+    padding: 10px;
 }
 
 .nameDisplayHeader

@@ -10,9 +10,21 @@ export interface StatusByStatus {
     total: number;
 }
 
+export interface StatusByManager {
+    status: string | null;
+    total: number;
+}
+
+export interface ManagerStatusCount {
+    manager: string;
+    total: number;
+    by_status: StatusByManager[];
+}
+
 export interface StatusCount {
     total: number;
     by_status: StatusByStatus[];
+    by_manager?: ManagerStatusCount[];
 }
 
 interface GetStatusPayload {
@@ -167,6 +179,7 @@ const getStatusOrdersCount = createAsyncThunk<
     async (manager, thunkAPI) => {
         try {
             const response = await ordersService.getStatusOrdersCount(manager)
+            console.log(response.data)
             return thunkAPI.fulfillWithValue({data: response.data, manager})
         }catch (e) {
             return thunkAPI.rejectWithValue("Something went wrong...");
@@ -181,10 +194,6 @@ const orderSlice = createSlice({
     reducers: {
         setOrder(state, action: PayloadAction<OrdersModel>) {
             state.order = action.payload;
-        },
-
-        clearOrder(state) {
-            state.order = null;
         }
     },
     extraReducers: builder =>
@@ -200,9 +209,9 @@ const orderSlice = createSlice({
             })
             .addCase(getGroups.fulfilled, (state, action) => {
                 state.loading = false;
-                state.groups = action.payload
+                state.groups = action.payload.results
 
-                state.group = action.payload
+                state.group = action.payload.results
             })
             .addCase(getGroups.rejected, (state) => {
                 state.loading = false
@@ -230,19 +239,28 @@ const orderSlice = createSlice({
             .addCase(getStatusOrdersCount.fulfilled, (state, action) => {
                 state.loading = false;
 
-                const normalized: StatusSumModel = {
+                state.statusSumCount = {
                     total: action.payload.data.total,
+
                     by_status: action.payload.data.by_status.map(s => ({
-                        status: s.status ?? "null",  // 🔹 convert null → string
+                        // @ts-ignore
+                        status: s.status_grouped ?? "New", // <-- convert here
                         total: s.total
                     }))
-                }
+                };
 
-                if (action.payload.manager) {
-                    state.managerStatusCount[action.payload.manager] = action.payload.data;
-                } else {
-                    state.statusSumCount = normalized;
-                }
+                    // Also include all managers
+                // @ts-ignore
+                action.payload.data.by_manager.forEach(m => {
+                    state.managerStatusCount[m.manager] = {
+                        total: m.total,
+                        by_status: m.by_status.map(s => ({
+                            status: s.status,
+                            total: s.total
+                        }))
+                    };
+                });
+
 
 
             })

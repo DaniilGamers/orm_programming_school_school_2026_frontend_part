@@ -16,8 +16,6 @@ const OrdersComponent = () => {
 
     const [errors, setErrors] = useState<string>('')
 
-    const [page, setPage] = useState(1);
-
     const [searchParams, setSearchParams] = useSearchParams();
 
     const orderParam = searchParams.get('order') || '';
@@ -41,6 +39,8 @@ const OrdersComponent = () => {
     const dispatch = useAppDispatch()
 
     const [query] = useSearchParams()
+
+    const [page, setPage] = useState(query.get("page") || 1);
 
     const filterString = '?' + query.toString();
 
@@ -167,13 +167,13 @@ const OrdersComponent = () => {
 
         setExpandedId(0)
 
-        window.location.reload()
-
 
 
     }
 
-    const handleDownload = async () => {
+    const handleDownload = async (e: FormEvent<HTMLButtonElement>) => {
+
+        e.preventDefault()
 
         const filterString = query.toString() ? `?${query.toString()}` : '';
 
@@ -206,12 +206,13 @@ const OrdersComponent = () => {
         if(text.length > 0){
             await dispatch(orderActions.sendComment({orderId: id, text }))
 
+            await dispatch(orderActions.getComments(id));
+
+            dispatch(orderActions.getOrders(filterString))
+
+            setText('')
         }
-        await dispatch(orderActions.getComments(id));
 
-        dispatch(orderActions.getOrders(filterString))
-
-        setText('')
 
     }
 
@@ -441,7 +442,7 @@ const OrdersComponent = () => {
                                                 <input value={text} minLength={1} onChange={handleComment} type={"text"} placeholder={"Comment"} />
                                                 {errors.length === 0 ? '' : (<span>{errors}</span>)}
                                             </label>
-                                                <button>SUBMIT</button>
+                                                <button disabled={Boolean(order.manager && order.manager !== user?.name)}>SUBMIT</button>
 
                                         </form>
                                     </div>

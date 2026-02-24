@@ -16,6 +16,7 @@ const AdminPanelComponent = () => {
     const {users} = useAppSelector((state) => state.user)
     const {user} = useAppSelector((state) => state.user)
 
+
     const { statusSumCount, managerStatusCount } = useAppSelector((state) => state.order);
 
     const [link, setLink] = useState<Record<number, string>>({})
@@ -121,6 +122,7 @@ const AdminPanelComponent = () => {
         return statusObj?.total ?? 0;
     };
 
+    // @ts-ignore
     return (
 
         <div>
@@ -130,6 +132,7 @@ const AdminPanelComponent = () => {
 
                 <div className={css.statsHeader}>
                     <div className={css.statsHeaderBox}><p>Orders statistic</p></div>
+
                     <div className={css.statsTotalBox}>
                         <p>total: {getStatusTotal(statusSumCount)}</p>
                         <p>In work: {getStatusTotal(statusSumCount, "In Work")}</p>

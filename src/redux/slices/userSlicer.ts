@@ -1,6 +1,7 @@
 import {UserModel} from "../../models/UserModel";
 import {createAsyncThunk, createSlice, isFulfilled} from "@reduxjs/toolkit";
 import {usersService} from "../../services/api.services";
+import {href} from "react-router-dom";
 
 interface UserSliceType {
     users: UserModel[];
@@ -46,6 +47,11 @@ const getManagerName = createAsyncThunk(
             return thunkAPI.fulfillWithValue(response.data)
         }
         catch (e) {
+
+            localStorage.removeItem("access")
+
+            window.location.replace('/login')
+
             return thunkAPI.rejectWithValue('Something went wrong...')
         }
     }

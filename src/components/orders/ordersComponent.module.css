@@ -193,6 +193,10 @@ th:hover{
 
 .commentInputWindow>button{
     padding: 15px;
+}
+
+.commentInputWindow>button:disabled{
+    padding: 15px;
     background: grey;
     border-color: grey;
     cursor: not-allowed;

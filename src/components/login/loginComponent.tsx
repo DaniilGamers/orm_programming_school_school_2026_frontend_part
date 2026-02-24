@@ -1,4 +1,4 @@
-import React, {FormEvent, useState} from 'react';
+import React, {FormEvent, useEffect, useState} from 'react';
 import css from './loginComponent.module.css'
 import {useNavigate} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../redux/store/store";
@@ -21,6 +21,22 @@ const LoginComponent = () => {
 
     const dispatch = useAppDispatch()
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    useEffect(() => {
+        if(localStorage.getItem("refresh"))
+        {
+            const token = String(localStorage.getItem("refresh"))
+            try {
+                dispatch(authActions.refresh({ refresh: token }))
+            }
+            catch(e){
+
+            }
+
+        }
+    }, [dispatch,navigate]);
+
     const handleEmailChange = (e: FormEvent<HTMLInputElement>) => {
 
         const emailInput = e.target as HTMLInputElement
@@ -38,6 +54,13 @@ const LoginComponent = () => {
                 setErrors(newErrors);
             }
 
+        }
+        else if (!emailRegex.test(email)) {
+            newErrors.email = "Invalid email format";
+
+            if (Object.keys(newErrors).length > 0) {
+                setErrors(newErrors);
+            }
         }
         else
         {
@@ -86,6 +109,8 @@ const LoginComponent = () => {
 
         const newErrors: typeof errors = {};
         if (!email) newErrors.email = "Min 1 char";
+
+        if (!emailRegex.test(email)) newErrors.email = "Invalid email format";
         if (!password) newErrors.password = "Password is required";
 
         if (Object.keys(newErrors).length > 0) {
