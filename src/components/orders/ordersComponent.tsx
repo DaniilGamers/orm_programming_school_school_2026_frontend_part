@@ -32,7 +32,8 @@ const OrdersComponent = () => {
 
     const [expandedId, setExpandedId] = useState<number | null>(null);
 
-    const [inputType, setInputType] = useState<'text' | 'date'>('text');
+    const [startInputType, setStartInputType] = useState<'text' | 'date'>('text');
+    const [endInputType, setEndInputType] = useState<'text' | 'date'>('text');
 
     const {comments} = useAppSelector((state) => state.order)
 
@@ -330,13 +331,13 @@ const OrdersComponent = () => {
 
                         <div>
                             <label>
-                                <input className={css.Inputs} type={inputType} placeholder={'Start date'} name={"start_date"} onFocus={() => setInputType('date')} onChange={handleChangeQuery} value={`${query.get("start_date") || ''}`}/>
+                                <input className={css.Inputs} type={startInputType} placeholder={'Start date'} name={"start_date"} onFocus={() => setStartInputType('date')} onChange={handleChangeQuery} value={`${query.get("start_date") || ''}`}/>
                             </label>
                         </div>
 
                         <div>
                             <label>
-                                <input className={css.Inputs} type={inputType} placeholder={'End date'} name={"end_date"} onFocus={() => setInputType('date')} onChange={handleChangeQuery} value={`${query.get("end_date") || ''}`}/>
+                                <input className={css.Inputs} type={endInputType} placeholder={'End date'} name={"end_date"} onFocus={() => setEndInputType('date')} onChange={handleChangeQuery} value={`${query.get("end_date") || ''}`}/>
                             </label>
                         </div>
 
