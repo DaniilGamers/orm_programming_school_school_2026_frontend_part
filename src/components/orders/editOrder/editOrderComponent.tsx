@@ -7,7 +7,7 @@ import {AppDispatch, useAppSelector} from "../../../redux/store/store";
 import {OrderEditModel} from "../../../models/OrderEditModel";
 const EditOrderComponent = () => {
 
-    const [errors, setErrors] = useState<{ name?: string, email?: string }>({});
+    const [errors, setErrors] = useState<{ name?: string, email?: string, age?: string, orderName?: string, surname?: string, phone?: string, sum?: string, already_paid?: string }>({});
 
     const { activeMenu, closeMenu } = useCreateMenu();
 
@@ -100,8 +100,6 @@ const EditOrderComponent = () => {
 
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
@@ -145,8 +143,51 @@ const EditOrderComponent = () => {
                 setErrors({ email: 'Email required' });
 
                 return
-            } else if (!emailRegex.test(form.email)) {
-                setErrors({ email: 'Invalid email format' });
+            }
+
+            const age = parseInt(form.age)
+
+            if(age < 0)
+            {
+                setErrors({ age: 'Less than 0 is not allowed'})
+
+                return
+            }else if(age === null)
+            {
+                setErrors({ age: 'Age required'})
+
+                return
+            }
+
+            if(!form.surname)
+            {
+                setErrors({ surname: 'Surname required'})
+
+                return
+            }
+
+            if(!form.name)
+            {
+                setErrors({ name: 'Name required'})
+
+                return
+            }
+            if(form.phone === '')
+            {
+                setErrors({ phone: 'Phone required'})
+
+                return
+            }
+            if(form.sum === '')
+            {
+                setErrors({ sum: 'Sum required'})
+
+                return
+            }
+
+            if(form.paid === '')
+            {
+                setErrors({ already_paid: 'Already paid required'})
 
                 return
             }
@@ -247,22 +288,30 @@ const EditOrderComponent = () => {
                                 <span>Name</span>
 
                                 <input value={form.name} type={"text"} placeholder={"Name"} onChange={e => setForm({ ...form, name: e.target.value })}/>
+
+                                {errors.orderName && (<span>{errors.orderName}</span>)}
                             </div>
                             <div className={css.rowPartBox}>
 
                                 <span>Sum</span>
 
                                 <input value={form.sum} type={"text"} placeholder={"Sum"} onChange={e => setForm({ ...form, sum: e.target.value })}/>
+
+                                {errors.sum && (<span>{errors.sum}</span>)}
                             </div>
                         </div>
                         <div className={css.rowBox}>
                             <div className={css.rowPartBox}>
                                 <span>Surname</span>
                                 <input value={form.surname} type={"text"} placeholder={"Surname"} onChange={e => setForm({ ...form, surname: e.target.value })}/>
+
+                                {errors.surname && (<span>{errors.surname}</span>)}
                             </div>
                             <div className={css.rowPartBox}>
                                 <span>Already paid</span>
-                                <input value={form.paid} type={"text"} placeholder={"Already paid"} onChange={e => setForm({ ...form, courseType: e.target.value })}/>
+                                <input value={form.paid} type={"text"} placeholder={"Already paid"} onChange={e => setForm({ ...form, paid: e.target.value })}/>
+
+                                {errors.already_paid && (<span>{errors.already_paid}</span>)}
                             </div>
                         </div>
 
@@ -291,6 +340,8 @@ const EditOrderComponent = () => {
                             <div  className={css.rowPartBox}>
                                 <span>Phone</span>
                                 <input value={form.phone} type={"text"} placeholder={"Phone"} onChange={e => setForm({ ...form, phone: e.target.value })}/>
+
+                                {errors.phone && (<span>{errors.phone}</span>)}
                             </div>
 
                             <div className={css.rowPartBox}>
@@ -308,6 +359,8 @@ const EditOrderComponent = () => {
                             <div className={css.rowPartBox}>
                                 <span>Age</span>
                                 <input value={form.age} type={"text"} placeholder={"Age"} onChange={e => setForm({ ...form, age: e.target.value })}/>
+
+                                {errors.age && (<span>{errors.age}</span>)}
                             </div>
 
                             <div className={css.rowPartBox}>
