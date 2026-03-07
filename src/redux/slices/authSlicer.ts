@@ -36,10 +36,12 @@ export const refresh = createAsyncThunk(
             const response = await authService.getRefresh(data)
             if (!localStorage.getItem("access")) {
                 localStorage.setItem('access', response.data.access)
+                localStorage.setItem('refresh', response.data.refresh)
                 window.location.replace('orders?page=1')
             }
             else{
                 localStorage.setItem('access', response.data.access)
+                localStorage.setItem('refresh', response.data.refresh)
             }
             return response.data
         }
