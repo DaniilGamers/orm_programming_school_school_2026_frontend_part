@@ -204,6 +204,9 @@ const orderSlice = createSlice({
 
                 state.count = action.payload.count
             })
+            .addCase(getOrders.pending, (state) => {
+                state.loading = false;
+            })
             .addCase(getOrders.rejected, (state) => {
                 state.loading = false
             })

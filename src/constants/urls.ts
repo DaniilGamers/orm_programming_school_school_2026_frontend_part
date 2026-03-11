@@ -3,13 +3,13 @@ const baseURL = 'http://127.0.0.1:8000/'
 const urls = {
     orders: {
         getOrders: (filterLink: string): string => `/orders${filterLink}`,
-        getGroups: (): string => `/orders/groups`,
+        getGroups: (): string => `/orders/groups_get`,
         getExcel: (filterLink: string = ''): string => `/orders/export${filterLink}`,
         sendComment:(id: number): string => `/orders/${id}/comment_post`,
         getComments:(order_id: number): string => `/orders/${order_id}/comment_get`,
         getStatusOrdersCount:(manager?: string): string => `/orders/status_count${manager ? `?manager=${manager}/` : ''}`,
         editOrder:(id: number): string => `/orders/${id}`,
-        addGroup:() => `/orders/groups`,
+        addGroup:() => `/orders/groups_post`,
     },
     users:{
         getManagers: (): string => `/users`,

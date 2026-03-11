@@ -23,15 +23,17 @@ const HeaderComponent = () => {
     const filterString = '?' + query.toString();
 
     useEffect(() => {
+        dispatch(userActions.getManagerName())
+    }, [dispatch]);
 
-        if(localStorage.getItem("refresh"))
+    useEffect(() => {
+
+        if(!localStorage.getItem("access"))
         {
             const token = String(localStorage.getItem("refresh"))
             dispatch(authActions.refresh({ refresh: token }))
 
         }
-
-        dispatch(userActions.getManagerName())
 
     }, [navigate,dispatch, filterString]);
 

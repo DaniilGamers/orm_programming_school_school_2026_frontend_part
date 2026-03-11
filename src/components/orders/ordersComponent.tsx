@@ -3,7 +3,6 @@ import {useAppDispatch, useAppSelector} from "../../redux/store/store";
 import {useSearchParams} from "react-router-dom";
 import {orderActions} from "../../redux/slices/orderSlicer";
 import css from "./ordersComponent.module.css"
-import {userActions} from "../../redux/slices/userSlicer";
 import resetIcon from "../../assets/reset.51c9a5b2e5527c0bfbcaf74793deb908.svg"
 import fileIcon from "../../assets/xls.476bc5b02e8b94a61782636d19526309.svg"
 import PaginationComponent from "../pagination/paginationComponent";
@@ -26,6 +25,8 @@ const OrdersComponent = () => {
 
     const loading = useAppSelector((state) => state.order.loading)
 
+    const [loadingPost, setLoadingPost] = useState(false)
+
     const {groups} = useAppSelector((state) => state.order)
 
     const {user} = useAppSelector((state) => state.user)
@@ -41,8 +42,15 @@ const OrdersComponent = () => {
 
     const [query] = useSearchParams()
 
+    const filterString = '?' + query.toString();
+
     const [page, setPage] = useState(query.get("page") || 1);
     const [debounceQuery, setDebounceQuery] = useState('');
+
+
+    useEffect(() => {
+        dispatch(orderActions.getGroups());
+    }, [dispatch]);
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
@@ -53,14 +61,17 @@ const OrdersComponent = () => {
     }, [searchParams]);
 
     useEffect(() => {
+        const fetchOrders = async () => {
+            if (!debounceQuery) {
+                await dispatch(orderActions.getOrders(''));
+            } else {
+                dispatch(orderActions.getOrders(filterString))
+            }
+        };
 
-        if (debounceQuery){
-            const filterString = '?' + debounceQuery;
-            dispatch(orderActions.getOrders(filterString))
-        }
-        dispatch(userActions.getManagerName());
-        dispatch(orderActions.getGroups());
-    }, [dispatch, debounceQuery]);
+        void fetchOrders()
+        // @ts-ignore
+    }, [debounceQuery, dispatch])
 
     const handleLoadComments = async (orderId: number) => {
         const response = await dispatch(orderActions.getComments(orderId));
@@ -94,7 +105,7 @@ const OrdersComponent = () => {
 
     const handleChangeQuery = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 
-        e.preventDefault()
+        e.preventDefault();
 
         const params = new URLSearchParams(searchParams);
         params.set('page', '1');
@@ -224,15 +235,24 @@ const OrdersComponent = () => {
 
         if(text.length > 0){
 
-            const filterString = '?' + query.toString();
+            setLoadingPost(true)
 
-            await dispatch(orderActions.sendComment({orderId: id, text }))
+            try{
 
-            await dispatch(orderActions.getComments(id));
+                await dispatch(orderActions.sendComment({orderId: id, text }))
 
-            dispatch(orderActions.getOrders(filterString))
+                await dispatch(orderActions.getComments(id));
 
-            setText('')
+                setText('')
+            }
+            catch (e){
+
+            }
+            finally {
+
+            setLoadingPost(false)
+
+            }
         }
 
 
@@ -250,7 +270,7 @@ const OrdersComponent = () => {
         <div>
             <nav className={css.filterBox}>
 
-                <form className={css.InputsMain}>
+                <form className={css.InputsMain} >
 
                     <section className={css.InputsBox}>
 
@@ -464,7 +484,7 @@ const OrdersComponent = () => {
                                                 <input value={text} minLength={1} onChange={handleComment} onKeyDown={(e) => {if(e.key === "Enter") e.preventDefault();}} type={"text"} placeholder={"Comment"} />
                                                 {errors.length === 0 ? '' : (<span>{errors}</span>)}
                                             </label>
-                                                <button disabled={Boolean(order.manager && order.manager !== user?.name)}>SUBMIT</button>
+                                                <button disabled={Boolean(order.manager && order.manager !== user?.name) || loadingPost}>SUBMIT</button>
 
                                         </form>
                                     </div>

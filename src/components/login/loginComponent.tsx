@@ -108,15 +108,19 @@ const LoginComponent = () => {
         e.preventDefault(); // <--- блокування дефолтного reload
 
         const newErrors: typeof errors = {};
+
         if (!email) newErrors.email = "Min 1 char";
 
         if (!emailRegex.test(email)) newErrors.email = "Invalid email format";
         if (!password) newErrors.password = "Password is required";
+        if (password.includes(' ')) newErrors.password = "No space";
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             return;
         }
+
+
 
         try {
             await dispatch(authActions.login({ email, password })).unwrap();

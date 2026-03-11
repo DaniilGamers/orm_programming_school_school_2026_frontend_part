@@ -33,17 +33,24 @@ export const refresh = createAsyncThunk(
     "authSlice/refresh",
     async (data: { refresh: string }, { rejectWithValue } ) => {
         try {
-            const response = await authService.getRefresh(data)
+            const response = await authService.getRefresh(data);
+
+            // Always update access token
+            if (response.data.access) {
+                localStorage.setItem('access', response.data.access);
+            }
+
+            // Update refresh token only if backend provides a new one
+            if (response.data.refresh) {
+                localStorage.setItem('refresh', response.data.refresh);
+            }
+
+            // Redirect only if access was missing before
             if (!localStorage.getItem("access")) {
-                localStorage.setItem('access', response.data.access)
-                localStorage.setItem('refresh', response.data.refresh)
-                window.location.replace('orders?page=1')
+                window.location.replace('orders?page=1');
             }
-            else{
-                localStorage.setItem('access', response.data.access)
-                localStorage.setItem('refresh', response.data.refresh)
-            }
-            return response.data
+
+            return response.data;
         }
         catch (err: any){
             return rejectWithValue(err.response?.data);

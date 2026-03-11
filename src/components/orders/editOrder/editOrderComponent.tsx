@@ -178,19 +178,6 @@ const EditOrderComponent = () => {
 
                 return
             }
-            if(form.sum === '')
-            {
-                setErrors({ sum: 'Sum required'})
-
-                return
-            }
-
-            if(form.paid === '')
-            {
-                setErrors({ already_paid: 'Already paid required'})
-
-                return
-            }
 
             const payload: OrderEditModel['data'] = {
                 name: form.name,
@@ -201,8 +188,8 @@ const EditOrderComponent = () => {
                 course: form.course,
                 course_format: form.courseFormat,
                 course_type: form.courseType,
-                sum: Number(form.sum),
-                alreadyPaid: Number(form.paid),
+                sum: Number(form.sum) || 0,
+                alreadyPaid: Number(form.paid) || 0,
                 status: form.status,
                 // @ts-ignore
                 manager: form.status === 'New' ? null : form.manager || null,
@@ -297,7 +284,6 @@ const EditOrderComponent = () => {
 
                                 <input value={form.sum} type={"text"} placeholder={"Sum"} onChange={e => setForm({ ...form, sum: e.target.value })}/>
 
-                                {errors.sum && (<span>{errors.sum}</span>)}
                             </div>
                         </div>
                         <div className={css.rowBox}>
@@ -311,7 +297,6 @@ const EditOrderComponent = () => {
                                 <span>Already paid</span>
                                 <input value={form.paid} type={"text"} placeholder={"Already paid"} onChange={e => setForm({ ...form, paid: e.target.value })}/>
 
-                                {errors.already_paid && (<span>{errors.already_paid}</span>)}
                             </div>
                         </div>
 
