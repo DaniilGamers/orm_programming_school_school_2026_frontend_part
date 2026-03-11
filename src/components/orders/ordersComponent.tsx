@@ -70,7 +70,6 @@ const OrdersComponent = () => {
         };
 
         void fetchOrders()
-        // @ts-ignore
     }, [debounceQuery, dispatch])
 
     const handleLoadComments = async (orderId: number) => {
