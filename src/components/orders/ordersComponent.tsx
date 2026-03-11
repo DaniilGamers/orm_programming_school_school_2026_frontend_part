@@ -55,7 +55,7 @@ const OrdersComponent = () => {
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             setDebounceQuery(searchParams.toString())
-        }, 500);
+        }, 1000);
 
         return () => clearTimeout(timeoutId);
     }, [searchParams]);
