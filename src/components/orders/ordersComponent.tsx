@@ -242,6 +242,8 @@ const OrdersComponent = () => {
 
                 await dispatch(orderActions.getComments(id));
 
+
+
                 setText('')
             }
             catch (e){
@@ -249,7 +251,9 @@ const OrdersComponent = () => {
             }
             finally {
 
-            setLoadingPost(false)
+                setLoadingPost(false)
+
+                await dispatch(orderActions.getOrders(filterString))
 
             }
         }
@@ -435,8 +439,9 @@ const OrdersComponent = () => {
                             (e.currentTarget.style.backgroundColor =
                                 index % 2 === 0 ? "#f3f3f3" : "lightgrey")}
                         onClick={() => {
+                            setText('')
                             setExpandedId(expandedId === order.id ? null : order.id);
-                            handleLoadComments(order.id).then()
+                            handleLoadComments(order.id).then();
                         }}>
                         <td>{displayValue(order.id)}</td>
                         <td>{displayValue(order.name)}</td>

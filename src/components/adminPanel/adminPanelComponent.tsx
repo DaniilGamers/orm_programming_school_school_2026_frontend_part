@@ -166,8 +166,8 @@ const AdminPanelComponent = () => {
                             <div className={css.mainButtonBox}>
                                 <button
                                     onClick={() => link[user.id] ? copyLink(user.id) : getLink(user.id)}>{link[user.id] ? "COPY TO CLIPBOARD" : user.is_active ? "CHANGE PASSWORD" : "ACTIVATE"}</button>
-                                <button onClick={() => ban(user.id)}>BAN</button>
-                                <button onClick={() => unban(user.id)}>UNBAN</button>
+                                {user.is_superuser ? '' : <button onClick={() => ban(user.id)}>BAN</button>}
+                                {user.is_superuser ? '' : <button onClick={() => unban(user.id)}>UNBAN</button>}
                             </div>
 
                             {copied[user.id] && (<span>Copied to clipboard!</span>)}

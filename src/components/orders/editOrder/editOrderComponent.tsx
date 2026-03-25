@@ -134,6 +134,8 @@ const EditOrderComponent = () => {
         else
         {
 
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
             if (addGroup){
                 setGroupMenu(true)
                 return
@@ -141,6 +143,11 @@ const EditOrderComponent = () => {
 
             if (!form.email) {
                 setErrors({ email: 'Email required' });
+
+                return
+            }
+            else if (!emailRegex.test(form.email)) {
+                setErrors({ email: 'Invalid email format' });
 
                 return
             }
@@ -182,9 +189,9 @@ const EditOrderComponent = () => {
             const payload: OrderEditModel['data'] = {
                 name: form.name,
                 surname: form.surname,
-                email: form.email,
-                phone: Number(form.phone),
-                age: Number(form.age),
+                email: form.email || 'null',
+                phone: Number(form.phone) || 0,
+                age: Number(form.age) || 0,
                 course: form.course,
                 course_format: form.courseFormat,
                 course_type: form.courseType,
